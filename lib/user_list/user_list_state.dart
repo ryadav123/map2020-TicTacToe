@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserListState extends State<UserList> {
-  List<User> _users = List<User>();
+  List<gameUser> _users = List<gameUser>();
 
   @override
   void initState() {
@@ -50,7 +50,7 @@ class UserListState extends State<UserList> {
 
     Map<String, dynamic> users = snapshot.value.cast<String, dynamic>();
     users.forEach((userId, userMap) {
-      User user = parseUser(userId, userMap);
+      gameUser user = parseUser(userId, userMap);
       setState(() {
         _users.add(user);
       });
@@ -58,7 +58,7 @@ class UserListState extends State<UserList> {
   }
 
   // Haven't figured out how to use built-in map-to-POJO parsers yet
-  User parseUser(String userId, Map<dynamic, dynamic> user) {
+  gameUser parseUser(String userId, Map<dynamic, dynamic> user) {
     String name, photoUrl, pushId;
     user.forEach((key, value) {
       if (key == NAME) {
@@ -72,10 +72,10 @@ class UserListState extends State<UserList> {
       }
     });
 
-    return User(userId, name, photoUrl, pushId);
+    return gameUser(userId, name, photoUrl, pushId);
   }
 
-  invite(User user) async {
+  invite(gameUser user) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var username = prefs.getString(USER_NAME);
     var pushId = prefs.getString(PUSH_ID);

@@ -1,5 +1,5 @@
-class User {
+class gameUser {
   String id, name, photoUrl, pushId;
 
-  User(this.id, this.name, this.photoUrl, this.pushId);
+  gameUser(this.id, this.name, this.photoUrl, this.pushId);
 }

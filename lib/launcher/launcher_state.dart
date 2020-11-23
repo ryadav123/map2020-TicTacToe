@@ -99,13 +99,13 @@ class LauncherState extends State<Launcher> {
   }
 
   void openUserList() async {
-    FirebaseUser user = await signInWithGoogle();
+    User user = await signInWithGoogle();
     await saveUserToFirebase(user);
     Navigator.of(context).pushNamed('userList');
   }
 
-  Future<FirebaseUser> signInWithGoogle() async {
-    var user = await _auth.currentUser;
+  Future<User> signInWithGoogle() async {
+    User user = await _auth.currentUser;
     if (user == null) {
       GoogleSignInAccount googleUser = _googleSignIn.currentUser;
       if (googleUser == null) {
@@ -125,7 +125,7 @@ class LauncherState extends State<Launcher> {
     return user;
   }
 
-  Future<void> saveUserToFirebase(FirebaseUser user) async {
+  Future<void> saveUserToFirebase(User user) async {
     print('saving user to firebase');
     var token = await firebaseMessaging.getToken();
 
