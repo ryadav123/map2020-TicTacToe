@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "885913653454",
+    "firebase_url": "https://rohan-map2020-tictactoe-c2242.firebaseio.com",
+    "project_id": "rohan-map2020-tictactoe-c2242",
+    "storage_bucket": "rohan-map2020-tictactoe-c2242.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:885913653454:android:d07a7755345e40effc009f",
+        "android_client_info": {
+          "package_name": "edu.uco.ryadav1.map2020.TicTacToe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "885913653454-gaf891n2grfsb129fok5or3folo6dcgv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.uco.ryadav1.map2020.TicTacToe",
+            "certificate_hash": "dfde0f39b2d4e043e4bf9933819b51f81690339f"
+          }
+        },
+        {
+          "client_id": "885913653454-v21fm7q5uupnb1lhdbb4hme1kvg6m45j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7kyh_UgaEpDVC-Zv3Gup2f2g_tiU1MQE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "885913653454-v21fm7q5uupnb1lhdbb4hme1kvg6m45j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
