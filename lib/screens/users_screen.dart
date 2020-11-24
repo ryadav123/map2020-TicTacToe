@@ -61,24 +61,30 @@ class UserListState extends State<UsersScreen> {
 
   Widget buildListRow(BuildContext context, int index) => Container(
       height: 56.0,
-      child: InkWell(
-          onTap: () {
-            Scaffold.of(context).showSnackBar(
-                SnackBar(content: Text('Clicked on ${_users[index].name}')));
-            invite(_users[index]);
-          },
-          child: Container(
-              padding: EdgeInsets.all(16.0),
-              alignment: Alignment.centerLeft,
-              child: Text(
-                '${_users[index].name}',
-                // Some weird bugs if passed without quotes
-                style: TextStyle(fontSize: 18.0),
-              ))));
+      child: Card(
+            color: Colors.green[100],
+            elevation: 5,
+            child: InkWell(
+            onTap: () {
+              Scaffold.of(context).showSnackBar(
+                  SnackBar(content: Text('Invitation sent to ${_users[index].name}')));
+              invite(_users[index]);
+            },
+            child: Container(
+                padding: EdgeInsets.all(8.0),
+                alignment: Alignment.centerLeft,
+                child: Center(
+                  child: Text(
+                    '${_users[index].name}',
+                    // Some weird bugs if passed without quotes
+                    style: TextStyle(fontSize: 18.0),
+                  ),
+                ))),
+      ));
 
   void fetchUsers() async {
     var snapshot =
-        await FirebaseDatabase.instance.reference().child(USERS).once();
+        await FirebaseDatabase.instance.reference().child('users').once();
 
     Map<String, dynamic> users = snapshot.value.cast<String, dynamic>();
     users.forEach((userId, userMap) {
@@ -108,23 +114,26 @@ class UserListState extends State<UsersScreen> {
   }
 
   invite(GameUser user) async {
+    print('Inviting user...\n');
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var username = prefs.getString(USER_NAME);
     var pushId = prefs.getString(PUSH_ID);
     var userId = prefs.getString(USER_ID);
 
-    //var base = 'https://us-central1-tictactoe-64902.cloudfunctions.net';
     var base = 'https://us-central1-rohan-map2020-tictactoe-c2242.cloudfunctions.net';
-    String dataURL = '$base/sendNotification?to=${user
+    String dataURL = '$base/Invitation?to=${user
         .pushId}&fromPushId=$pushId&fromId=$userId&fromName=$username&type=invite';
-    print(dataURL);
-    print('\n\n\n\n');
+    print('pushId = $pushId \n\n');
+    print('userId = $userId \n\n');
+    print('username = $username \n\n');
     String gameId = '$userId-${user.id}';
+    print('gameId = $gameId \n\n');
     FirebaseDatabase.instance
         .reference()
         .child('games')
         .child(gameId)
         .set(null);
+    print('Invitation sent waiting for reply...\n');
     http.Response response = await http.get(dataURL);
   }
 }

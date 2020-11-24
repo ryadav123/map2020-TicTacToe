@@ -1,4 +1,9 @@
 const functions = require('firebase-functions');
+const admin = require('firebase-admin');
+
+
+admin.initializeApp(functions.config().firebase);
+
 
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
@@ -7,115 +12,39 @@ const functions = require('firebase-functions');
 //   functions.logger.info("Hello logs!", {structuredData: true});
 //   response.send("Hello from Firebase!");
 // });
-const admin = require('firebase-admin');
-admin.initializeApp(functions.config().firebase);
 
-// exports.sendNotification = functions.https.onRequest((req, res) => {
-//     const to = req.query.to;
-//     const fromId = req.query.fromId;
-//     const fromPushId = req.query.fromPushId;
-//     const fromName = req.query.fromName;
-//     const type = req.query.type;
-//     const title = req.query.title;
-//     const body = req.query.body;
-
-//     var payload;
-//     if (to === 'all') {
-//         if (body !== undefined && body !== '') {
-//             payload = {
-//                 notification: {
-//                     title: title,
-//                     body: body
-//                 }
-//             };
-//         } else {
-//             payload = {
-//                 notification: {
-//                     title: title
-//                 }
-//             };
-//         }
-//     } else {
-//         payload = {
-//             data: {
-//                 fromId: fromId,
-//                 fromPushId: fromPushId,
-//                 fromName: fromName,
-//                 type: type
-//             },
-//             notification: {
-//                 title: 'hi',
-//                 body: 'body'
-//             }
-//         };
-//     }
-
-//     var options = {
-//         priority: "high",
-//         timeToLive: 60 * 60 * 24
-//     };
-
-//     if (to === 'all') {
-//         admin.messaging().sendToTopic(to, payload, options)
-//             .then(function (response) {
-//                 res.send(200, 'ok');
-//                 return;
-//             })
-//             .catch(function (error) {
-//                 res.send(200, 'failed');
-//             });
-//     } else {
-//         admin.messaging().sendToDevice(to, payload, options)
-//             .then(function (response) {
-//                 res.send(200, 'ok');
-//                 return;
-//             })
-//             .catch(function (error) {
-//                 res.send(200, 'failed');
-//             });
-//     }
-// });
-
-exports.sendNotification = functions.https.onRequest((req, res) => {
-    const to = req.query.to;
-    const fromId = req.query.fromId;
-    const fromPushId = req.query.fromPushId;
-    const fromName = req.query.fromName;
-    const type = req.query.type;
-
-    var payload = {
-        data: {
-            click_action: "FLUTTER_NOTIFICATION_CLICK",
-            fromId: fromId,
-            fromPushId: fromPushId,
-            fromName: fromName,
-            type: type
-        }
-        };
+exports.Invitation = functions.https.onRequest((request, response) => {
+    const to = request.query.to;
+    const fromId = request.query.fromId;
+    const fromPushId = request.query.fromPushId;
+    const fromName = request.query.fromName;
+    const type = request.query.type;
+    var paylod;
 
     if (type === 'invite') {
-        payload.notification = {
-            title: 'Game invite',
-            body: `${fromName} invites you to play!`
+            payload = {
+            notification: { title: 'Game invite', body: `${fromName} invites you to play!`},
+            data: { click_action: "FLUTTER_NOTIFICATION_CLICK",fromId: fromId,fromPushId: fromPushId,fromName: fromName,type: type}       
         };
-        } else if (type === 'accept') {
-                 payload.notification = {
-                 title: 'Game invite',
-                 body: `${fromName} accepted your invitation!`
-                };
-        }
-
+        }   else {
+            payload = {
+                notification: { title: 'Game invite', body: `${fromName} accepted your invitation!`},
+                data: { click_action: "FLUTTER_NOTIFICATION_CLICK",fromId: fromId,fromPushId: fromPushId,fromName: fromName,type: type}       
+            }; 
+        }    
+    
     var options = {
         priority: "high",
         timeToLive: 60 * 60 * 24
         };
 
-    admin.messaging().sendToDevice(to, payload, options)
-        .then(function (response) {
-            res.send(200, 'ok');
+        
+     admin.messaging().sendToDevice(to, payload, options)
+        .then(function(response) {
+            console.log("Successfully sent message:", response);
             return;
         })
-        .catch(function (error) {
-            res.send(200, 'failed');
+        .catch(function(error) {
+            console.log("Error sending message:", error);
         });
 });

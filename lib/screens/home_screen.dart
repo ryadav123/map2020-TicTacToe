@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:TicTacToe/common/constants.dart';
 import 'package:TicTacToe/screens/game_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:TicTacToe/model/gameuser.dart';
+//import 'package:TicTacToe/model/gameuser.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -32,15 +32,15 @@ class _HomeState extends State<HomeScreen> {
     super.initState();
     firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
-        print("onMessage: $message");
+        print("onMessage: $message\n\n");
         handleMessage(message);
       },
       onLaunch: (Map<String, dynamic> message) async {
-        print("onLaunch: $message");
+        print("onLaunch: $message\n\n");
         handleMessage(message);
       },
       onResume: (Map<String, dynamic> message) async {
-        print("onResume: $message");
+        print("onResume: $message\n\n");
         handleMessage(message);
       },
     );
@@ -115,7 +115,9 @@ class _HomeState extends State<HomeScreen> {
       actions: <Widget>[
         FlatButton(
           child: Text('Decline'),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
         FlatButton(
           child: Text('Accept'),
@@ -132,28 +134,52 @@ class _HomeState extends State<HomeScreen> {
     await saveUserToFirebase(user);
     Navigator.of(context).pushNamed(UsersScreen.routeName);
   }
- 
-  // Original Function
+
   Future<User> signInWithGoogle() async {
-    User user = await _auth.currentUser;
-    if (user == null) {
-      GoogleSignInAccount googleUser = _googleSignIn.currentUser;
-      if (googleUser == null) {
-        googleUser = await _googleSignIn.signInSilently();
-        if (googleUser == null) {
-          googleUser = await _googleSignIn.signIn();
-        }
-      }
+     User user = await _auth.currentUser;
+    // if (user == null) {
+    //   GoogleSignInAccount googleUser = _googleSignIn.currentUser;
+    //   if (googleUser == null) {
+    //     googleUser = await _googleSignIn.signInSilently();
+    //     if (googleUser == null) {
+    //       googleUser = await _googleSignIn.signIn();
+    //     }
+    //   }
+      
+      GoogleSignInAccount googleUser = await _googleSignIn.signIn();
 
       GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       AuthCredential credential = GoogleAuthProvider.credential(idToken:googleAuth.idToken,accessToken:googleAuth.accessToken);
       UserCredential result = await _auth.signInWithCredential(credential);
       user = await _auth.currentUser;
       print("signed in as " + user.displayName);
-      }
+      
     print("signed in as " + user.displayName);
+    print('user email: '+user.email);
     return user;
   }
+ 
+  // Original Function
+  // Future<User> signInWithGoogle() async {
+  //   User user = await _auth.currentUser;
+  //   if (user == null) {
+  //     GoogleSignInAccount googleUser = _googleSignIn.currentUser;
+  //     if (googleUser == null) {
+  //       googleUser = await _googleSignIn.signInSilently();
+  //       if (googleUser == null) {
+  //         googleUser = await _googleSignIn.signIn();
+  //       }
+  //     }
+
+  //     GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+  //     AuthCredential credential = GoogleAuthProvider.credential(idToken:googleAuth.idToken,accessToken:googleAuth.accessToken);
+  //     UserCredential result = await _auth.signInWithCredential(credential);
+  //     user = await _auth.currentUser;
+  //     print("signed in as " + user.displayName);
+  //     }
+  //   print("signed in as " + user.displayName);
+  //   return user;
+  // }
 
   Future<void> saveUserToFirebase(User user) async {
     print('saving user to firebase');
@@ -168,7 +194,7 @@ class _HomeState extends State<HomeScreen> {
     };
     return FirebaseDatabase.instance
         .reference()
-        .child(USERS)
+        .child('users') // heading under which users are  saved in realtime database
         .child(user.uid)
         .update(update);
   }
@@ -193,7 +219,7 @@ class _HomeState extends State<HomeScreen> {
 
       FirebaseDatabase.instance
           .reference()
-          .child(USERS)
+          .child('users')
           .child(currentUser.uid)
           .update({PUSH_ID: token});
       print('updated FCM token');
@@ -201,6 +227,8 @@ class _HomeState extends State<HomeScreen> {
   }
 
   void accept(Map<String, dynamic> message) async {
+    Navigator.pop(context);
+    print('Inside accept function..');
     String fromPushId = getValueFromMap(message, 'fromPushId');
     String fromId = getValueFromMap(message, 'fromId');
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -210,8 +238,9 @@ class _HomeState extends State<HomeScreen> {
 
     var base = 'https://us-central1-rohan-map2020-tictactoe-c2242.cloudfunctions.net';
     String dataURL =
-        '$base/sendNotification?to=$fromPushId&fromPushId=$pushId&fromId=$userId&fromName=$username&type=accept';
+        '$base/Invitation?to=$fromPushId&fromPushId=$pushId&fromId=$userId&fromName=$username&type=accept';
     print(dataURL);
+
     http.Response response = await http.get(dataURL);
 
     String gameId = '$fromId-$userId';
@@ -226,9 +255,11 @@ class _HomeState extends State<HomeScreen> {
   }
 
   void handleMessage(Map<String, dynamic> message) async {
+    print('Decoding type..\n');
     var type = getValueFromMap(message, 'type');
+    print('Decoding fromId..\n');
     var fromId = getValueFromMap(message, 'fromId');
-
+    print('Message has been received. The type of message is: ');
     print(type);
     if (type == 'invite') {
       showInvitePopup(context, message);

@@ -10,7 +10,7 @@ const DRAFT = 12;
 const NAME = 'name';
 const PHOTO_URL = 'photoUrl';
 const PUSH_ID = 'pushId';
-const USERS = 'users';
+//const USERS = 'users';
 const USER_ID = 'userId';
 const USER_NAME = 'userName';
 
