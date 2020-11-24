@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:TicTacToe/ai/decision.dart';
 
 class AI {

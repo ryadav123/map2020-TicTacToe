@@ -14,6 +14,6 @@ const USERS = 'users';
 const USER_ID = 'userId';
 const USER_NAME = 'userName';
 
-const SINGLE_GAME = 'singleGame';
-const MULTIPLAYER = 'Multiplayer';
-const USER_LIST = 'userList';
+//const SINGLE_GAME = 'singleGame';
+//const MULTIPLAYER = 'Multiplayer';
+//const USER_LIST = 'userList';

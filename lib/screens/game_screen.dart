@@ -3,14 +3,26 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:TicTacToe/ai/ai.dart';
 import 'package:TicTacToe/common/constants.dart';
-import 'package:TicTacToe/game/game.dart';
 import 'package:TicTacToe/victory/victory.dart';
 import 'package:TicTacToe/victory/victory_checker.dart';
 import 'package:TicTacToe/victory/victory_line.dart';
 import 'package:TicTacToe/shape/circle/circle..dart';
 import 'package:TicTacToe/shape/cross/cross.dart';
 
-class GameState extends State<Game> {
+class GameScreen extends StatefulWidget {
+
+  static const routeName = '/homeScreen/gameScreen';
+
+  GameScreen({Key key, this.title, this.type, this.me, this.gameId, this.withId})
+      : super(key: key);
+
+  final String title, type, me, gameId, withId;
+
+  @override
+  GameState createState() => GameState(type: type, me: me, gameId: gameId, withId: withId);
+}
+
+class GameState extends State<GameScreen> {
   BuildContext _context;
   List<List<String>> field = [
     ['', '', ''],
@@ -83,9 +95,30 @@ class GameState extends State<Game> {
     ai = AI(field, playerChar, aiChar);
 
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
+        appBar:PreferredSize(
+        preferredSize: Size.fromHeight(100),
+        child: AppBar(
+          backgroundColor: Colors.white,
+          title: Center(
+            child: Text(
+              widget.title,
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          elevation: 0,
+          flexibleSpace: ClipPath(
+            clipper: _AppBarClipper(),
+            child: Container(
+                decoration: BoxDecoration(
+              color: Colors.blue,
+            )),
+          ),
         ),
+      ),
         body: Builder(builder: (BuildContext context) {
           _context = context;
           return Center(
@@ -302,4 +335,19 @@ class GameState extends State<Game> {
     print(text);
     Scaffold.of(_context).showSnackBar(SnackBar(content: Text(text)));
   }
+}
+
+class _AppBarClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    Path path = Path();
+    path.lineTo(0, size.height - 50);
+    path.quadraticBezierTo(
+        size.width / 2, size.height, size.width, size.height - 50);
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
+  }
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => true;
 }

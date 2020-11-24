@@ -1,8 +1,8 @@
 import 'dart:async';
+import 'package:TicTacToe/screens/users_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:TicTacToe/common/constants.dart';
-import 'package:TicTacToe/game/game.dart';
-import 'package:TicTacToe/launcher/launcher.dart';
+import 'package:TicTacToe/screens/game_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:TicTacToe/model/gameuser.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -12,7 +12,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:TicTacToe/common/util.dart';
 import 'package:http/http.dart' as http;
 
-class LauncherState extends State<Launcher> {
+
+class HomeScreen extends StatefulWidget {
+  HomeScreen({Key key, this.title}) : super(key: key);
+
+  final String title;
+  
+  @override
+  State<StatefulWidget> createState() => _HomeState();
+}
+
+class _HomeState extends State<HomeScreen> {
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -21,15 +31,15 @@ class LauncherState extends State<Launcher> {
   void initState() {
     super.initState();
     firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) {
+      onMessage: (Map<String, dynamic> message) async {
         print("onMessage: $message");
         handleMessage(message);
       },
-      onLaunch: (Map<String, dynamic> message) {
+      onLaunch: (Map<String, dynamic> message) async {
         print("onLaunch: $message");
         handleMessage(message);
       },
-      onResume: (Map<String, dynamic> message) {
+      onResume: (Map<String, dynamic> message) async {
         print("onResume: $message");
         handleMessage(message);
       },
@@ -40,9 +50,30 @@ class LauncherState extends State<Launcher> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
+  Widget build(BuildContext context) => Scaffold(      
+      appBar:PreferredSize(
+        preferredSize: Size.fromHeight(100),
+        child: AppBar(
+          backgroundColor: Colors.white,
+          title: Center(
+            child: Text(
+              widget.title,
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          elevation: 0,
+          flexibleSpace: ClipPath(
+            clipper: _AppBarClipper(),
+            child: Container(
+                decoration: BoxDecoration(
+              color: Colors.blue,
+            )),
+          ),
+        ),
       ),
       body: Center(
         child: Column(
@@ -50,19 +81,17 @@ class LauncherState extends State<Launcher> {
           children: [
             MaterialButton(
                 onPressed: () {
-                  Navigator.of(context).pushNamed(SINGLE_GAME);
+                  Navigator.of(context).pushNamed(GameScreen.routeName);
                 },
                 padding: EdgeInsets.all(8.0),
-                child: Text('Single Mode', style: TextStyle(fontSize: 32.0))),
-            Container(
-                margin: EdgeInsets.only(top: 16.0),
-                child: MaterialButton(
-                    padding: EdgeInsets.all(8.0),
-                    onPressed: () {
-                      openUserList();
-                    },
-                    child:
-                        Text(MULTIPLAYER, style: TextStyle(fontSize: 34.0)))),
+                child: Text('Single Player', style: TextStyle(fontSize: 30.0))),
+            MaterialButton(
+                padding: EdgeInsets.all(8.0),
+                onPressed: () {
+                  openUserList();
+                },
+                child:
+                    Text('Multi Player', style: TextStyle(fontSize: 35.0))),
           ],
         ),
       ));
@@ -101,9 +130,10 @@ class LauncherState extends State<Launcher> {
   void openUserList() async {
     User user = await signInWithGoogle();
     await saveUserToFirebase(user);
-    Navigator.of(context).pushNamed('userList');
+    Navigator.of(context).pushNamed(UsersScreen.routeName);
   }
-
+ 
+  // Original Function
   Future<User> signInWithGoogle() async {
     User user = await _auth.currentUser;
     if (user == null) {
@@ -121,7 +151,7 @@ class LauncherState extends State<Launcher> {
       user = await _auth.currentUser;
       print("signed in as " + user.displayName);
       }
-
+    print("signed in as " + user.displayName);
     return user;
   }
 
@@ -178,16 +208,16 @@ class LauncherState extends State<Launcher> {
     var pushId = prefs.getString(PUSH_ID);
     var userId = prefs.getString(USER_ID);
 
-    var base = 'https://us-central1-tictactoe-64902.cloudfunctions.net';
+    var base = 'https://us-central1-rohan-map2020-tictactoe-c2242.cloudfunctions.net';
     String dataURL =
-        '$base/sendNotification2?to=$fromPushId&fromPushId=$pushId&fromId=$userId&fromName=$username&type=accept';
+        '$base/sendNotification?to=$fromPushId&fromPushId=$pushId&fromId=$userId&fromName=$username&type=accept';
     print(dataURL);
     http.Response response = await http.get(dataURL);
 
     String gameId = '$fromId-$userId';
 
     Navigator.of(context).push(new MaterialPageRoute(
-        builder: (context) => new Game(
+        builder: (context) => new GameScreen(
             title: 'Tic Tac Toe',
             type: "wifi",
             me: 'O',
@@ -207,7 +237,7 @@ class LauncherState extends State<Launcher> {
 
       String gameId = '${currentUser.uid}-$fromId';
       Navigator.of(context).push(new MaterialPageRoute(
-          builder: (context) => new Game(
+          builder: (context) => new GameScreen(
               title: 'Tic Tac Toe',
               type: "wifi",
               me: 'X',
@@ -215,4 +245,20 @@ class LauncherState extends State<Launcher> {
               withId: fromId)));
     } else if (type == 'reject') {}
   }
+}
+
+
+class _AppBarClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    Path path = Path();
+    path.lineTo(0, size.height - 50);
+    path.quadraticBezierTo(
+        size.width / 2, size.height, size.width, size.height - 50);
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
+  }
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => true;
 }

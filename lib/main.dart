@@ -1,9 +1,9 @@
+import 'package:TicTacToe/screens/home_screen.dart';
+import 'package:TicTacToe/screens/users_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:TicTacToe/common/constants.dart';
-import 'package:TicTacToe/game/game.dart';
-import 'package:TicTacToe/launcher/launcher.dart';
-import 'package:TicTacToe/user_list/user_list.dart';
+import 'package:TicTacToe/screens/game_screen.dart';
 
 void main() async{
     WidgetsFlutterBinding.ensureInitialized();
@@ -13,14 +13,15 @@ void main() async{
 class TicTacToe extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialApp(
+    debugShowCheckedModeBanner: false,
         title: 'Tic Tac Toe',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: Launcher(title: 'Tic Tac Toe'),
+        home: HomeScreen(title: 'Home Screen'),
         routes: <String, WidgetBuilder>{
-          SINGLE_GAME: (BuildContext context) => Game(title: 'Tic Tac Toe'),
-          USER_LIST: (BuildContext context) => UserList(title: 'All users')
+          GameScreen.routeName: (BuildContext context) => GameScreen(title: 'Player vs AI'),
+          UsersScreen.routeName: (BuildContext context) => UsersScreen(title: 'All Users')
         },
       );
 }

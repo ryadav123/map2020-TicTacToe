@@ -1,13 +1,24 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:TicTacToe/common/constants.dart';
-import 'package:TicTacToe/model/gameuser.dart';
-import 'package:TicTacToe/user_list/user_list.dart';
+import 'package:TicTacToe/model/gameUser.dart';
+//import 'package:TicTacToe/user_list/user_list.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-class UserListState extends State<UserList> {
-  List<gameUser> _users = List<gameUser>();
+
+class UsersScreen extends StatefulWidget {
+  final String title;
+  static const routeName = '/homeScreen/usersScreen';
+
+  UsersScreen({Key key, this.title}) : super(key: key);
+
+  @override
+  UserListState createState() => UserListState();
+}
+
+class UserListState extends State<UsersScreen> {
+  List<GameUser> _users = List<GameUser>();
 
   @override
   void initState() {
@@ -20,9 +31,30 @@ class UserListState extends State<UserList> {
     print('build');
 
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
+        appBar:PreferredSize(
+        preferredSize: Size.fromHeight(100),
+        child: AppBar(
+          backgroundColor: Colors.white,
+          title: Center(
+            child: Text(
+              widget.title,
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          elevation: 0,
+          flexibleSpace: ClipPath(
+            clipper: _AppBarClipper(),
+            child: Container(
+                decoration: BoxDecoration(
+              color: Colors.blue,
+            )),
+          ),
         ),
+      ),
         body: ListView.builder(
             itemCount: _users.length, itemBuilder: buildListRow));
   }
@@ -50,7 +82,7 @@ class UserListState extends State<UserList> {
 
     Map<String, dynamic> users = snapshot.value.cast<String, dynamic>();
     users.forEach((userId, userMap) {
-      gameUser user = parseUser(userId, userMap);
+      GameUser user = parseUser(userId, userMap);
       setState(() {
         _users.add(user);
       });
@@ -58,7 +90,7 @@ class UserListState extends State<UserList> {
   }
 
   // Haven't figured out how to use built-in map-to-POJO parsers yet
-  gameUser parseUser(String userId, Map<dynamic, dynamic> user) {
+  GameUser parseUser(String userId, Map<dynamic, dynamic> user) {
     String name, photoUrl, pushId;
     user.forEach((key, value) {
       if (key == NAME) {
@@ -72,19 +104,21 @@ class UserListState extends State<UserList> {
       }
     });
 
-    return gameUser(userId, name, photoUrl, pushId);
+    return GameUser(userId, name, photoUrl, pushId);
   }
 
-  invite(gameUser user) async {
+  invite(GameUser user) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var username = prefs.getString(USER_NAME);
     var pushId = prefs.getString(PUSH_ID);
     var userId = prefs.getString(USER_ID);
 
-    var base = 'https://us-central1-tictactoe-64902.cloudfunctions.net';
-    String dataURL = '$base/sendNotification2?to=${user
+    //var base = 'https://us-central1-tictactoe-64902.cloudfunctions.net';
+    var base = 'https://us-central1-rohan-map2020-tictactoe-c2242.cloudfunctions.net';
+    String dataURL = '$base/sendNotification?to=${user
         .pushId}&fromPushId=$pushId&fromId=$userId&fromName=$username&type=invite';
     print(dataURL);
+    print('\n\n\n\n');
     String gameId = '$userId-${user.id}';
     FirebaseDatabase.instance
         .reference()
@@ -93,4 +127,19 @@ class UserListState extends State<UserList> {
         .set(null);
     http.Response response = await http.get(dataURL);
   }
+}
+
+class _AppBarClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    Path path = Path();
+    path.lineTo(0, size.height - 50);
+    path.quadraticBezierTo(
+        size.width / 2, size.height, size.width, size.height - 50);
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
+  }
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => true;
 }
