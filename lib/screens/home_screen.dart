@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:TicTacToe/model/mydialog.dart';
 import 'package:TicTacToe/screens/users_screen.dart';
 import 'package:flutter/material.dart';
-//import 'package:TicTacToe/common/constants.dart';
 import 'package:TicTacToe/screens/game_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 //import 'package:TicTacToe/model/gameuser.dart';
@@ -10,7 +9,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:TicTacToe/common/util.dart';
+import 'package:TicTacToe/model/utility.dart';
 import 'package:http/http.dart' as http;
 
 
@@ -99,9 +98,7 @@ class _HomeState extends State<HomeScreen> {
       ));
 
   void showInvitePopup(BuildContext context, Map<String, dynamic> message) {
-    print(context == null);
-
-    Timer(Duration(milliseconds: 200), () {
+   Timer(Duration(milliseconds: 200), () {
       showDialog<bool>(
         context: context,
         builder: (_) => buildDialog(context, message),
@@ -137,51 +134,27 @@ class _HomeState extends State<HomeScreen> {
     Navigator.of(context).pushNamed(UsersScreen.routeName);
   }
 
+   
   Future<User> signInWithGoogle() async {
-     User user = await _auth.currentUser;
-    // if (user == null) {
-    //   GoogleSignInAccount googleUser = _googleSignIn.currentUser;
-    //   if (googleUser == null) {
-    //     googleUser = await _googleSignIn.signInSilently();
-    //     if (googleUser == null) {
-    //       googleUser = await _googleSignIn.signIn();
-    //     }
-    //   }
-      
-      GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+    User user = await _auth.currentUser;
+    if (user == null) {
+      GoogleSignInAccount googleUser = _googleSignIn.currentUser;
+      if (googleUser == null) {
+        googleUser = await _googleSignIn.signInSilently();
+        if (googleUser == null) {
+          googleUser = await _googleSignIn.signIn();
+        }
+      }
 
       GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       AuthCredential credential = GoogleAuthProvider.credential(idToken:googleAuth.idToken,accessToken:googleAuth.accessToken);
       UserCredential result = await _auth.signInWithCredential(credential);
       user = await _auth.currentUser;
       print("signed in as " + user.displayName);
-      
+      }
     print("signed in as " + user.displayName);
-    print('user email: '+user.email);
     return user;
   }
- 
-  // Original Function
-  // Future<User> signInWithGoogle() async {
-  //   User user = await _auth.currentUser;
-  //   if (user == null) {
-  //     GoogleSignInAccount googleUser = _googleSignIn.currentUser;
-  //     if (googleUser == null) {
-  //       googleUser = await _googleSignIn.signInSilently();
-  //       if (googleUser == null) {
-  //         googleUser = await _googleSignIn.signIn();
-  //       }
-  //     }
-
-  //     GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-  //     AuthCredential credential = GoogleAuthProvider.credential(idToken:googleAuth.idToken,accessToken:googleAuth.accessToken);
-  //     UserCredential result = await _auth.signInWithCredential(credential);
-  //     user = await _auth.currentUser;
-  //     print("signed in as " + user.displayName);
-  //     }
-  //   print("signed in as " + user.displayName);
-  //   return user;
-  // }
 
   Future<void> saveUserToFirebase(User user) async {
     print('saving user to firebase');

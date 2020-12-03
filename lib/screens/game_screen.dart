@@ -3,7 +3,6 @@ import 'package:TicTacToe/model/winnerline.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:TicTacToe/ai/ai.dart';
-//import 'package:TicTacToe/common/constants.dart';
 
 class GameScreen extends StatefulWidget {
 
@@ -61,7 +60,7 @@ class GameState extends State<GameScreen> {
               playersTurn = true;
               Timer(Duration(milliseconds: 600), () {
                 setState(() {
-                  checkForVictory();
+                  winnerCheck();
                 });
               });
             });
@@ -94,7 +93,6 @@ class GameState extends State<GameScreen> {
     print(withId);
 
     ai = AI(field, playerChar, aiChar);
-
     return Scaffold(
         appBar:PreferredSize(
         preferredSize: Size.fromHeight(100),
@@ -177,21 +175,6 @@ class GameState extends State<GameScreen> {
         }));
   }
 
-  // Widget buildGrid() => AspectRatio(
-  //     aspectRatio: 1.0,
-  //     child: Stack(
-  //       children: [
-  //         Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-  //           buildHorizontalLine,
-  //           buildHorizontalLine,
-  //         ]),
-  //         Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-  //           buildVerticalLine,
-  //           buildVerticalLine,
-  //         ])
-  //       ],
-  //     ));
-
   Container get buildVerticalLine => Container(
       margin: EdgeInsets.only(top: 16.0, bottom: 16.0),
       color: Colors.black,
@@ -202,58 +185,55 @@ class GameState extends State<GameScreen> {
       color: Colors.black,
       height: 10.0);
 
-  // Widget buildField() => AspectRatio(
-  //     aspectRatio: 1.0,
-  //     child:
-  //         Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-  //       Expanded(
-  //           child: Row(
-  //               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //               children: [
-  //             buildCell(0, 0),
-  //             buildCell(0, 1),
-  //             buildCell(0, 2),
-  //           ])),
-  //       Expanded(
-  //           child: Row(
-  //               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //               children: [
-  //             buildCell(1, 0),
-  //             buildCell(1, 1),
-  //             buildCell(1, 2),
-  //           ])),
-  //       Expanded(
-  //           child: Row(
-  //               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //               children: [
-  //             buildCell(2, 0),
-  //             buildCell(2, 1),
-  //             buildCell(2, 2),
-  //           ]))
-  //     ]));
-
   Widget buildCell(int row, int column) => AspectRatio(
       aspectRatio: 1.0,
       child: GestureDetector(
           onTap: () {
+            // Displaying player turn
             if (!gameIsDone() && playersTurn && !cellTaken(row, column)) {
               setState(() {
-                displayPlayersTurn(row, column);
+                  print('clicked on row $row column $column');
+                  playersTurn = false;
+                  field[row][column] = playerChar;
+                  // In case of multiplayer
+                      if (type != null && type == 'wifi') {
+                        FirebaseDatabase.instance
+                            .reference()
+                            .child('games')
+                            .child(gameId)
+                            .child('${row}_${column}')
+                            .set(me);
+                      }
 
-                // if (!gameIsDone() && type == null) {
-                //   displayAiTurn();
-                // }
+                  Timer(Duration(milliseconds: 600), () {
+                    setState(() {
+                      winnerCheck();
+                    });
+                  });                
               });
-              setState(() {
-               // displayPlayersTurn(row, column);
-                print('Inside set state of AI');
-                if (!gameIsDone() && type == null && winner == false) {
+
+              // Displaying AI turn            
+              if (!gameIsDone() && type == null && winner == false) {
                   print('Inside if of AI Value of winner is:$winner');
-                  displayAiTurn();
-                }
-              });
-            }
-          },
+                  setState(() {               
+                  print('Inside set state of AI');                
+                  Timer(Duration(milliseconds: 1000), () {
+                    setState(() {
+                    // AI turn
+                    var aiDecision = ai.getDecision();
+                    field[aiDecision.row][aiDecision.column] = aiChar;
+                    playersTurn = true;
+                    Timer(Duration(milliseconds: 600), () {
+                      setState(() {
+                        winnerCheck();
+                      });
+                    });
+                  });
+                });                
+                });
+              }
+            }            
+          }, 
           child: buildCellItem(row, column)));
 
   Widget buildCellItem(int row, int column) {
@@ -273,49 +253,10 @@ class GameState extends State<GameScreen> {
     }
   }
 
-  // Widget buildWinnerLine() => AspectRatio(
-  //     aspectRatio: 1.0, child: CustomPaint(painter: WinnerLine(winner,win_line,win_row,win_col)));
-
-  void displayPlayersTurn(int row, int column) {
-    print('clicked on row $row column $column');
-    playersTurn = false;
-    field[row][column] = playerChar;
-
-    if (type != null && type == 'wifi') {
-      FirebaseDatabase.instance
-          .reference()
-          .child('games')
-          .child(gameId)
-          .child('${row}_${column}')
-          .set(me);
-    }
-
-    Timer(Duration(milliseconds: 600), () {
-      setState(() {
-        checkForVictory();
-      });
-    });
-  }
-
-  void displayAiTurn() {
-    Timer(Duration(milliseconds: 1000), () {
-      setState(() {
-        // AI turn
-        var aiDecision = ai.getDecision();
-        field[aiDecision.row][aiDecision.column] = aiChar;
-        playersTurn = true;
-        Timer(Duration(milliseconds: 600), () {
-          setState(() {
-            checkForVictory();
-          });
-        });
-      });
-    });
-  }
-
   bool gameIsDone() {
     return allCellsAreTaken() || winner;
   }
+
   bool cellTaken (row,column) {
     return field[row][column].isNotEmpty;
   }
@@ -332,7 +273,7 @@ class GameState extends State<GameScreen> {
         field[2][2].isNotEmpty;
   }
 
-  void checkForVictory() {
+  void winnerCheck() {
     String winnermessage;
     //check horizontal lines
     if (field[0][0].isNotEmpty &&
@@ -419,7 +360,6 @@ class GameState extends State<GameScreen> {
           }
     }
 
-
     //check diagonal
     else if (field[0][0].isNotEmpty &&
         field[0][0] == field[1][1] &&
@@ -459,29 +399,24 @@ class GameState extends State<GameScreen> {
           winnermessage = "Draft";
     }
 
-  //  victory = VictoryChecker.checkForVictory(field, playerChar);
-    if (winner || draft) {
-     // String message;
-
-      // if (victory.winner == PLAYER_WINNER) {
-      //   message = 'You Win!';
-      // } else if (victory.winner == AI_WINNER) {
-      //   message = type == null ? 'AI Win!' : 'You loose!';
-      // } else if (victory.winner == DRAFT) {
-      //   message = 'Draft';
-      // }
+    if (winner || draft) {     
       print(winnermessage);
-      Scaffold.of(_context).showSnackBar(SnackBar(
-            content: Text(winnermessage),
-            duration: Duration(minutes: 1),
-            action: SnackBarAction(
-                label: 'Retry',
+      showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Center(child: Text('Game Alert')),
+          content: Text(winnermessage),
+          actions: <Widget> [
+            FlatButton(
+              child: Text('Retry'),
                 onPressed: () {
+                  Navigator.of(context).pop();
                   if (type == null) {
                     setState(() {
                       winner = false; 
                       draft = false;                    
-                    //  victory = null;
                       field = [
                         ['', '', ''],
                         ['', '', ''],
@@ -492,8 +427,15 @@ class GameState extends State<GameScreen> {
                   } else {
                     restart();
                   }
-                }),
-          ));
+                }),            
+            FlatButton(
+              child: Text('OK'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        );
+      }
+    );      
     }
   }
 
@@ -517,8 +459,7 @@ class GameState extends State<GameScreen> {
   }
 
   void cleanUp() {
-    winner = false;
-   // victory = null;
+    winner = false;   
     field = [
       ['', '', ''],
       ['', '', ''],
