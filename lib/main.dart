@@ -2,7 +2,7 @@ import 'package:TicTacToe/screens/home_screen.dart';
 import 'package:TicTacToe/screens/users_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:TicTacToe/common/constants.dart';
+//import 'package:TicTacToe/common/constants.dart';
 import 'package:TicTacToe/screens/game_screen.dart';
 
 void main() async{

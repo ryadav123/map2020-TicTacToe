@@ -1,6 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:TicTacToe/common/constants.dart';
+//import 'package:TicTacToe/common/constants.dart';
 import 'package:TicTacToe/model/gameUser.dart';
 //import 'package:TicTacToe/user_list/user_list.dart';
 import 'package:http/http.dart' as http;
@@ -99,13 +99,13 @@ class UserListState extends State<UsersScreen> {
   GameUser parseUser(String userId, Map<dynamic, dynamic> user) {
     String name, photoUrl, pushId;
     user.forEach((key, value) {
-      if (key == NAME) {
+      if (key == 'name') {
         name = value as String;
       }
-      if (key == PHOTO_URL) {
+      if (key == 'photoUrl') {
         photoUrl = value as String;
       }
-      if (key == PUSH_ID) {
+      if (key == 'pushId') {
         pushId = value as String;
       }
     });
@@ -116,9 +116,9 @@ class UserListState extends State<UsersScreen> {
   invite(GameUser user) async {
     print('Inviting user...\n');
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var username = prefs.getString(USER_NAME);
-    var pushId = prefs.getString(PUSH_ID);
-    var userId = prefs.getString(USER_ID);
+    var username = prefs.getString('userName');
+    var pushId = prefs.getString('pushId');
+    var userId = prefs.getString('userId');
 
     var base = 'https://us-central1-rohan-map2020-tictactoe-c2242.cloudfunctions.net';
     String dataURL = '$base/Invitation?to=${user

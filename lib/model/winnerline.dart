@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:TicTacToe/common/constants.dart';
-import 'package:TicTacToe/victory/victory.dart';
+//import 'package:TicTacToe/common/constants.dart';
+//import 'package:TicTacToe/victory/victory.dart';
 
-class VictoryLine extends CustomPainter {
+class WinnerLine extends CustomPainter {
   Paint _paint;
-  Victory _victory;
+  String lineType;
+  int row;
+  int col;
+  bool winner;
 
   @override
   bool hitTest(Offset position) {
     return false;
   }
 
-  VictoryLine(Victory victory) {
-    this._victory = victory;
+  WinnerLine(winner,lineType,row,column) {
+    this.winner = winner;
+    this.lineType = lineType;
+    this.row = row;
+    this.col = column;
     _paint = Paint();
     _paint.color = Colors.deepOrange;
     _paint.strokeWidth = 10.0;
@@ -23,14 +29,14 @@ class VictoryLine extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     print('paint');
-    if (_victory != null) {
-      if (_victory.lineType == HORIZONTAL) {
-        _drawHorizontalLine(_victory.row, size, canvas);
-      } else if (_victory.lineType == VERTICAL) {
-        _drawVerticalLine(_victory.col, size, canvas);
-      } else if (_victory.lineType == DIAGONAL_ASCENDING) {
+    if (winner) {
+      if (lineType == "Hor") {
+        _drawHorizontalLine(row, size, canvas);
+      } else if (lineType == "Ver") {
+        _drawVerticalLine(col, size, canvas);
+      } else if (lineType == "Dia_Asc") {
         _drawDiagonalLine(true, size, canvas);
-      } else if (_victory.lineType == DIAGONAL_DESCENDING)
+      } else if (lineType == "Dia_Des")
         _drawDiagonalLine(false, size, canvas);
     }
   }
@@ -88,8 +94,8 @@ class VictoryLine extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(VictoryLine oldDelegate) => false;
+  bool shouldRepaint(WinnerLine oldDelegate) => false;
 
   @override
-  bool shouldRebuildSemantics(VictoryLine oldDelegate) => false;
+  bool shouldRebuildSemantics(WinnerLine oldDelegate) => false;
 }

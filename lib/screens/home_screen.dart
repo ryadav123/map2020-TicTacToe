@@ -1,7 +1,8 @@
 import 'dart:async';
+import 'package:TicTacToe/model/mydialog.dart';
 import 'package:TicTacToe/screens/users_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:TicTacToe/common/constants.dart';
+//import 'package:TicTacToe/common/constants.dart';
 import 'package:TicTacToe/screens/game_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 //import 'package:TicTacToe/model/gameuser.dart';
@@ -188,9 +189,9 @@ class _HomeState extends State<HomeScreen> {
     await saveUserToPreferences(user.uid, user.displayName, token);
 
     var update = {
-      NAME: user.displayName,
-      PHOTO_URL: user.photoUrl,
-      PUSH_ID: token
+      'name': user.displayName,
+      'photoUrl': user.photoUrl,
+      'pushId': token
     };
     return FirebaseDatabase.instance
         .reference()
@@ -201,9 +202,9 @@ class _HomeState extends State<HomeScreen> {
 
   saveUserToPreferences(String userId, String userName, String pushId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString(USER_ID, userId);
-    prefs.setString(PUSH_ID, pushId);
-    prefs.setString(USER_NAME, userName);
+    prefs.setString('userId', userId);
+    prefs.setString('pushId', pushId);
+    prefs.setString('userName', userName);
   }
 
   // Not sure how FCM token gets updated yet
@@ -215,13 +216,13 @@ class _HomeState extends State<HomeScreen> {
       print(token);
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString(PUSH_ID, token);
+      prefs.setString('pushId', token);
 
       FirebaseDatabase.instance
           .reference()
           .child('users')
           .child(currentUser.uid)
-          .update({PUSH_ID: token});
+          .update({'pushId': token});
       print('updated FCM token');
     }
   }
@@ -232,17 +233,17 @@ class _HomeState extends State<HomeScreen> {
     String fromPushId = getValueFromMap(message, 'fromPushId');
     String fromId = getValueFromMap(message, 'fromId');
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var username = prefs.getString(USER_NAME);
-    var pushId = prefs.getString(PUSH_ID);
-    var userId = prefs.getString(USER_ID);
+    var username = prefs.getString('userName');
+    var pushId = prefs.getString('pushId');
+    var userId = prefs.getString('userId');
 
     var base = 'https://us-central1-rohan-map2020-tictactoe-c2242.cloudfunctions.net';
     String dataURL =
         '$base/Invitation?to=$fromPushId&fromPushId=$pushId&fromId=$userId&fromName=$username&type=accept';
     print(dataURL);
-
+    MyDialog.circularProgressStart(context);
     http.Response response = await http.get(dataURL);
-
+    MyDialog.circularProgressEnd(context);
     String gameId = '$fromId-$userId';
 
     Navigator.of(context).push(new MaterialPageRoute(

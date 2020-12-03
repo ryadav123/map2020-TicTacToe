@@ -1,13 +1,9 @@
 import 'dart:async';
+import 'package:TicTacToe/model/winnerline.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:TicTacToe/ai/ai.dart';
-import 'package:TicTacToe/common/constants.dart';
-import 'package:TicTacToe/victory/victory.dart';
-import 'package:TicTacToe/victory/victory_checker.dart';
-import 'package:TicTacToe/victory/victory_line.dart';
-import 'package:TicTacToe/shape/circle/circle..dart';
-import 'package:TicTacToe/shape/cross/cross.dart';
+//import 'package:TicTacToe/common/constants.dart';
 
 class GameScreen extends StatefulWidget {
 
@@ -32,8 +28,12 @@ class GameState extends State<GameScreen> {
   AI ai;
   String playerChar = 'X', aiChar = 'O';
   bool playersTurn = true;
-  Victory victory;
+  //Victory victory;
   final String type, me, gameId, withId;
+  bool winner = false;
+  int win_row = -1;
+  int win_col = -1;
+  String win_line = "";
 
   GameState({this.type, this.me, this.gameId, this.withId});
 
@@ -123,7 +123,8 @@ class GameState extends State<GameScreen> {
           _context = context;
           return Center(
               child: Stack(
-                  children: [buildGrid(), buildField(), buildVictoryLine()]));
+                  //children: [buildGrid(), buildField()]));
+                  children: [buildGrid(), buildField(), buildWinnerLine()]));
         }));
   }
 
@@ -202,17 +203,21 @@ class GameState extends State<GameScreen> {
     var cell = field[row][column];
     if (cell.isNotEmpty) {
       if (cell == 'X') {
-        return Container(padding: EdgeInsets.all(24.0), child: Cross());
+        return Container(padding: EdgeInsets.all(14.0), child: 
+        Text('X',style: TextStyle(fontSize: 100,fontWeight: FontWeight.bold,color: Colors.red,),textAlign: TextAlign.center,));
+        
       } else {
-        return Container(padding: EdgeInsets.all(24.0), child: Circle());
+        return Container(padding: EdgeInsets.all(14.0), child:
+        Text('O',style: TextStyle(fontSize: 100,fontWeight: FontWeight.bold,color: Colors.blue,),textAlign: TextAlign.center,)); 
+       
       }
     } else {
       return null;
     }
   }
 
-  Widget buildVictoryLine() => AspectRatio(
-      aspectRatio: 1.0, child: CustomPaint(painter: VictoryLine(victory)));
+  Widget buildWinnerLine() => AspectRatio(
+      aspectRatio: 1.0, child: CustomPaint(painter: WinnerLine(winner,win_line,win_row,win_col)));
 
   void displayPlayersTurn(int row, int column) {
     print('clicked on row $row column $column');
@@ -252,7 +257,7 @@ class GameState extends State<GameScreen> {
   }
 
   bool gameIsDone() {
-    return allCellsAreTaken() || victory != null;
+    return allCellsAreTaken() || winner;
   }
 
   bool allCellsAreTaken() {
@@ -268,27 +273,155 @@ class GameState extends State<GameScreen> {
   }
 
   void checkForVictory() {
-    victory = VictoryChecker.checkForVictory(field, playerChar);
-    if (victory != null) {
-      String message;
+    String winnermessage;
+    //check horizontal lines
+    if (field[0][0].isNotEmpty &&
+        field[0][0] == field[0][1] &&
+        field[0][0] == field[0][2])
+        {
+          winner = true;
+          win_line = "Hor";
+          win_row = 0;
+          if (field[0][0] == playerChar) {
+          winnermessage = "You Win";
+          } else if (type==null) {
+            winnermessage = "AI Win";
+          } else {
+            winnermessage = "You loose";
+          }
+    } else if (field[1][0].isNotEmpty &&
+        field[1][0] == field[1][1] &&
+        field[1][0] == field[1][2]) {
+          winner = true;
+          win_line = "Hor";
+          win_row = 1;
+          if (field[1][0] == playerChar) {
+          winnermessage = "You Win";
+          } else if (type==null) {
+            winnermessage = "AI Win";
+          } else {
+            winnermessage = "You loose";
+          }
+    } else if (field[2][0].isNotEmpty &&
+        field[2][0] == field[2][1] &&
+        field[2][0] == field[2][2]) {
+          winner = true;
+          win_line = "Hor";
+          win_row = 2;
+          if (field[2][0] == playerChar) {
+          winnermessage = "You Win";
+          } else if (type==null) {
+            winnermessage = "AI Win";
+          } else {
+            winnermessage = "You loose";
+          }
+    }
 
-      if (victory.winner == PLAYER_WINNER) {
-        message = 'You Win!';
-      } else if (victory.winner == AI_WINNER) {
-        message = type == null ? 'AI Win!' : 'You loose!';
-      } else if (victory.winner == DRAFT) {
-        message = 'Draft';
-      }
-      print(message);
+    //check vertical lines
+    else if (field[0][0].isNotEmpty &&
+        field[0][0] == field[1][0] &&
+        field[0][0] == field[2][0]) {
+          winner = true;
+          win_line = "Ver";
+          win_col = 0;
+          if (field[0][0] == playerChar) {
+          winnermessage = "You Win";
+          } else if (type==null) {
+            winnermessage = "AI Win";
+          } else {
+            winnermessage = "You loose";
+          }
+    } else if (field[0][1].isNotEmpty &&
+        field[0][1] == field[1][1] &&
+        field[0][1] == field[2][1]) {
+          winner = true;
+          win_line = "Ver";
+          win_col = 1;
+          if (field[0][1] == playerChar) {
+          winnermessage = "You Win";
+          } else if (type==null) {
+            winnermessage = "AI Win";
+          } else {
+            winnermessage = "You loose";
+          }
+    } else if (field[0][2].isNotEmpty &&
+        field[0][2] == field[1][2] &&
+        field[0][2] == field[2][2]) {
+          winner = true;
+          win_line = "Ver";
+          win_col = 2;
+          if (field[0][2] == playerChar) {
+          winnermessage = "You Win";
+          } else if (type==null) {
+            winnermessage = "AI Win";
+          } else {
+            winnermessage = "You loose";
+          }
+    }
+
+
+    //check diagonal
+    else if (field[0][0].isNotEmpty &&
+        field[0][0] == field[1][1] &&
+        field[0][0] == field[2][2]) {
+          winner = true;
+          win_line = "Dia_Des";          
+          if (field[0][0] == playerChar) {
+          winnermessage = "You Win";
+          } else if (type==null) {
+            winnermessage = "AI Win";
+          } else {
+            winnermessage = "You loose";
+          }
+    } else if (field[2][0].isNotEmpty &&
+        field[2][0] == field[1][1] &&
+        field[2][0] == field[0][2]) {
+          winner = true;
+          win_line = "Dia_Asc";
+          if (field[2][0] == playerChar) {
+          winnermessage = "You Win";
+          } else if (type==null) {
+            winnermessage = "AI Win";
+          } else {
+            winnermessage = "You loose";
+          }
+    } else if (field[0][0].isNotEmpty &&
+        field[0][1].isNotEmpty &&
+        field[0][2].isNotEmpty &&
+        field[1][0].isNotEmpty &&
+        field[1][1].isNotEmpty &&
+        field[1][2].isNotEmpty &&
+        field[2][0].isNotEmpty &&
+        field[2][1].isNotEmpty &&
+        field[2][2].isNotEmpty) {
+          winner = true;
+          winnermessage = "Draft";
+    }
+
+  //  victory = VictoryChecker.checkForVictory(field, playerChar);
+    if (winner) {
+     // String message;
+
+      // if (victory.winner == PLAYER_WINNER) {
+      //   message = 'You Win!';
+      // } else if (victory.winner == AI_WINNER) {
+      //   message = type == null ? 'AI Win!' : 'You loose!';
+      // } else if (victory.winner == DRAFT) {
+      //   message = 'Draft';
+      // }
+      print(winnermessage);
       Scaffold.of(_context).showSnackBar(SnackBar(
-            content: Text(message),
+            content: Text(winnermessage),
             duration: Duration(minutes: 1),
             action: SnackBarAction(
                 label: 'Retry',
                 onPressed: () {
                   if (type == null) {
                     setState(() {
-                      victory = null;
+                      winner = false;
+                      win_row = -1;
+                      win_col = -1;
+                    //  victory = null;
                       field = [
                         ['', '', ''],
                         ['', '', ''],
@@ -324,7 +457,8 @@ class GameState extends State<GameScreen> {
   }
 
   void cleanUp() {
-    victory = null;
+    winner = false;
+   // victory = null;
     field = [
       ['', '', ''],
       ['', '', ''],
