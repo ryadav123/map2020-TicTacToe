@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-//import 'package:TicTacToe/common/constants.dart';
-//import 'package:TicTacToe/victory/victory.dart';
 
 class WinnerLine extends CustomPainter {
   Paint _paint;
@@ -21,27 +19,26 @@ class WinnerLine extends CustomPainter {
     this.row = row;
     this.col = column;
     _paint = Paint();
-    _paint.color = Colors.deepOrange;
-    _paint.strokeWidth = 10.0;
+    _paint.color = Colors.greenAccent[400];
+    _paint.strokeWidth = 15.0;
     _paint.strokeCap = StrokeCap.round;
   }
 
   @override
-  void paint(Canvas canvas, Size size) {
-    print('paint');
+  void paint(Canvas canvas, Size size) {    
     if (winner) {
       if (lineType == "Hor") {
-        _drawHorizontalLine(row, size, canvas);
+        _isHorizontalLine(row, size, canvas);
       } else if (lineType == "Ver") {
-        _drawVerticalLine(col, size, canvas);
+        _isVerticalLine(col, size, canvas);
       } else if (lineType == "Dia_Asc") {
-        _drawDiagonalLine(true, size, canvas);
+        _isDiagonalLine(true, size, canvas);
       } else if (lineType == "Dia_Des")
-        _drawDiagonalLine(false, size, canvas);
+        _isDiagonalLine(false, size, canvas);
     }
   }
 
-  void _drawVerticalLine(int column, Size size, Canvas canvas) {
+  void _isVerticalLine(int column, Size size, Canvas canvas) {
     if (column == 0) {
       var x = size.width / 3 / 2;
       var top = Offset(x, 8.0);
@@ -61,7 +58,7 @@ class WinnerLine extends CustomPainter {
     }
   }
 
-  void _drawHorizontalLine(int row, Size size, Canvas canvas) {
+  void _isHorizontalLine(int row, Size size, Canvas canvas) {
     if (row == 0) {
       var y = size.height / 3 / 2;
       var left = Offset(8.0, y);
@@ -81,7 +78,7 @@ class WinnerLine extends CustomPainter {
     }
   }
 
-  void _drawDiagonalLine(bool isAscending, Size size, Canvas canvas) {
+  void _isDiagonalLine(bool isAscending, Size size, Canvas canvas) {
     if (isAscending) {
       var bottomLeft = Offset(8.0, size.height - 8.0);
       var topRight = Offset(size.width - 8.0, 8.0);

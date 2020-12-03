@@ -31,6 +31,7 @@ class GameState extends State<GameScreen> {
   //Victory victory;
   final String type, me, gameId, withId;
   bool winner = false;
+  bool draft = false;
   int win_row = -1;
   int win_col = -1;
   String win_line = "";
@@ -122,8 +123,7 @@ class GameState extends State<GameScreen> {
         body: Builder(builder: (BuildContext context) {
           _context = context;
           return Center(
-              child: Stack(
-                  //children: [buildGrid(), buildField()]));
+              child: Stack(                  
                   children: [buildGrid(), buildField(), buildWinnerLine()]));
         }));
   }
@@ -145,13 +145,13 @@ class GameState extends State<GameScreen> {
 
   Container get buildVerticalLine => Container(
       margin: EdgeInsets.only(top: 16.0, bottom: 16.0),
-      color: Colors.grey,
-      width: 5.0);
+      color: Colors.black,
+      width: 10.0);
 
   Container get buildHorizontalLine => Container(
       margin: EdgeInsets.only(left: 16.0, right: 16.0),
-      color: Colors.grey,
-      height: 5.0);
+      color: Colors.black,
+      height: 10.0);
 
   Widget buildField() => AspectRatio(
       aspectRatio: 1.0,
@@ -191,7 +191,15 @@ class GameState extends State<GameScreen> {
               setState(() {
                 displayPlayersTurn(row, column);
 
-                if (!gameIsDone() && type == null) {
+                // if (!gameIsDone() && type == null) {
+                //   displayAiTurn();
+                // }
+              });
+              setState(() {
+               // displayPlayersTurn(row, column);
+                print('Inside set state of AI');
+                if (!gameIsDone() && type == null && winner == false) {
+                  print('Inside if of AI Value of winner is:$winner');
                   displayAiTurn();
                 }
               });
@@ -394,12 +402,13 @@ class GameState extends State<GameScreen> {
         field[2][0].isNotEmpty &&
         field[2][1].isNotEmpty &&
         field[2][2].isNotEmpty) {
-          winner = true;
+          winner = false;
+          draft = true;
           winnermessage = "Draft";
     }
 
   //  victory = VictoryChecker.checkForVictory(field, playerChar);
-    if (winner) {
+    if (winner || draft) {
      // String message;
 
       // if (victory.winner == PLAYER_WINNER) {
@@ -418,9 +427,8 @@ class GameState extends State<GameScreen> {
                 onPressed: () {
                   if (type == null) {
                     setState(() {
-                      winner = false;
-                      win_row = -1;
-                      win_col = -1;
+                      winner = false; 
+                      draft = false;                    
                     //  victory = null;
                       field = [
                         ['', '', ''],
