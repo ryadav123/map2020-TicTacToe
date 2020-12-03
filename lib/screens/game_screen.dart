@@ -205,17 +205,15 @@ class GameState extends State<GameScreen> {
                             .set(me);
                       }
 
-                  Timer(Duration(milliseconds: 600), () {
-                    setState(() {
-                      winnerCheck();
-                    });
+                  Timer(Duration(milliseconds: 600), () {                   
+                      winnerCheck();                  
                   });                
               });
 
-              // Displaying AI turn            
+              // Displaying AI turn       
+              print('Before winner Value:$winner');    
               if (!gameIsDone() && type == null && winner == false) {
                   print('Inside if of AI Value of winner is:$winner');
-                  setState(() {               
                   print('Inside set state of AI');                
                   Timer(Duration(milliseconds: 1000), () {
                     setState(() {
@@ -224,13 +222,10 @@ class GameState extends State<GameScreen> {
                     field[aiDecision.row][aiDecision.column] = aiChar;
                     playersTurn = true;
                     Timer(Duration(milliseconds: 600), () {
-                      setState(() {
                         winnerCheck();
-                      });
                     });
                   });
-                });                
-                });
+                });    
               }
             }            
           }, 
