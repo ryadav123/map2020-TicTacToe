@@ -28,7 +28,7 @@ class GameState extends State<GameScreen> {
   AI ai;
   String playerChar = 'X', aiChar = 'O';
   bool playersTurn = true;
-  //Victory victory;
+ 
   final String type, me, gameId, withId;
   bool winner = false;
   bool draft = false;
@@ -120,28 +120,77 @@ class GameState extends State<GameScreen> {
           ),
         ),
       ),
-        body: Builder(builder: (BuildContext context) {
+  body: Builder(builder: (BuildContext context) {
           _context = context;
           return Center(
               child: Stack(                  
-                  children: [buildGrid(), buildField(), buildWinnerLine()]));
+                  children: [
+                    // Building the Grid
+                    AspectRatio(
+                                aspectRatio: 1.0,
+                                child: Stack(
+                                  children: [
+                                    Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+                                      buildHorizontalLine,
+                                      buildHorizontalLine,
+                                    ]),
+                                    Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+                                      buildVerticalLine,
+                                      buildVerticalLine,
+                                    ])
+                                  ],
+                                )),
+                    // Building the Field like each box
+                    AspectRatio(
+                                  aspectRatio: 1.0,
+                                  child:
+                                      Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+                                    Expanded(
+                                        child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                          buildCell(0, 0),
+                                          buildCell(0, 1),
+                                          buildCell(0, 2),
+                                        ])),
+                                    Expanded(
+                                        child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                          buildCell(1, 0),
+                                          buildCell(1, 1),
+                                          buildCell(1, 2),
+                                        ])),
+                                    Expanded(
+                                        child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                          buildCell(2, 0),
+                                          buildCell(2, 1),
+                                          buildCell(2, 2),
+                                        ]))
+                                  ])),
+                    // Building thw winner line if any
+                    AspectRatio(
+                           aspectRatio: 1.0, child: CustomPaint(painter: WinnerLine(winner,win_line,win_row,win_col)))
+                    ]));
         }));
   }
 
-  Widget buildGrid() => AspectRatio(
-      aspectRatio: 1.0,
-      child: Stack(
-        children: [
-          Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-            buildHorizontalLine,
-            buildHorizontalLine,
-          ]),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-            buildVerticalLine,
-            buildVerticalLine,
-          ])
-        ],
-      ));
+  // Widget buildGrid() => AspectRatio(
+  //     aspectRatio: 1.0,
+  //     child: Stack(
+  //       children: [
+  //         Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+  //           buildHorizontalLine,
+  //           buildHorizontalLine,
+  //         ]),
+  //         Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+  //           buildVerticalLine,
+  //           buildVerticalLine,
+  //         ])
+  //       ],
+  //     ));
 
   Container get buildVerticalLine => Container(
       margin: EdgeInsets.only(top: 16.0, bottom: 16.0),
@@ -153,41 +202,41 @@ class GameState extends State<GameScreen> {
       color: Colors.black,
       height: 10.0);
 
-  Widget buildField() => AspectRatio(
-      aspectRatio: 1.0,
-      child:
-          Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-        Expanded(
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-              buildCell(0, 0),
-              buildCell(0, 1),
-              buildCell(0, 2),
-            ])),
-        Expanded(
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-              buildCell(1, 0),
-              buildCell(1, 1),
-              buildCell(1, 2),
-            ])),
-        Expanded(
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-              buildCell(2, 0),
-              buildCell(2, 1),
-              buildCell(2, 2),
-            ]))
-      ]));
+  // Widget buildField() => AspectRatio(
+  //     aspectRatio: 1.0,
+  //     child:
+  //         Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+  //       Expanded(
+  //           child: Row(
+  //               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //               children: [
+  //             buildCell(0, 0),
+  //             buildCell(0, 1),
+  //             buildCell(0, 2),
+  //           ])),
+  //       Expanded(
+  //           child: Row(
+  //               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //               children: [
+  //             buildCell(1, 0),
+  //             buildCell(1, 1),
+  //             buildCell(1, 2),
+  //           ])),
+  //       Expanded(
+  //           child: Row(
+  //               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //               children: [
+  //             buildCell(2, 0),
+  //             buildCell(2, 1),
+  //             buildCell(2, 2),
+  //           ]))
+  //     ]));
 
   Widget buildCell(int row, int column) => AspectRatio(
       aspectRatio: 1.0,
       child: GestureDetector(
           onTap: () {
-            if (!gameIsDone() && playersTurn) {
+            if (!gameIsDone() && playersTurn && !cellTaken(row, column)) {
               setState(() {
                 displayPlayersTurn(row, column);
 
@@ -224,8 +273,8 @@ class GameState extends State<GameScreen> {
     }
   }
 
-  Widget buildWinnerLine() => AspectRatio(
-      aspectRatio: 1.0, child: CustomPaint(painter: WinnerLine(winner,win_line,win_row,win_col)));
+  // Widget buildWinnerLine() => AspectRatio(
+  //     aspectRatio: 1.0, child: CustomPaint(painter: WinnerLine(winner,win_line,win_row,win_col)));
 
   void displayPlayersTurn(int row, int column) {
     print('clicked on row $row column $column');
@@ -266,6 +315,9 @@ class GameState extends State<GameScreen> {
 
   bool gameIsDone() {
     return allCellsAreTaken() || winner;
+  }
+  bool cellTaken (row,column) {
+    return field[row][column].isNotEmpty;
   }
 
   bool allCellsAreTaken() {

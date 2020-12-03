@@ -213,7 +213,7 @@ class _HomeState extends State<HomeScreen> {
     var currentUser = await _auth.currentUser;
     if (currentUser != null) {
       var token = await firebaseMessaging.getToken();
-      print(token);
+      print("token is $token");
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('pushId', token);
