@@ -80,6 +80,7 @@ class _HomeState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Image.asset('assets/images/tictactoe.jpg',width: 210,height: 150),
             MaterialButton(
                 onPressed: () {
                   Navigator.of(context).pushNamed(GameScreen.routeName);
@@ -207,7 +208,6 @@ class _HomeState extends State<HomeScreen> {
     prefs.setString('userName', userName);
   }
 
-  // Not sure how FCM token gets updated yet
   // just to make sure correct one is always set
   void updateFcmToken() async {
     var currentUser = await _auth.currentUser;
