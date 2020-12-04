@@ -1,8 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-//import 'package:TicTacToe/common/constants.dart';
 import 'package:TicTacToe/model/gameUser.dart';
-//import 'package:TicTacToe/user_list/user_list.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,7 +21,7 @@ class UserListState extends State<UsersScreen> {
   @override
   void initState() {
     super.initState();
-    fetchUsers();
+    getUsers();
   }
 
   @override
@@ -45,6 +43,14 @@ class UserListState extends State<UsersScreen> {
               ),
             ),
           ),
+           actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.home),
+               onPressed: () {                  
+                
+                },
+               ),            
+          ],
           elevation: 0,
           flexibleSpace: ClipPath(
             clipper: _AppBarClipper(),
@@ -61,7 +67,7 @@ class UserListState extends State<UsersScreen> {
 
   Widget buildListRow(BuildContext context, int index) => Container(
       height: 56.0,
-      child: Card(
+      child: Card(            
             color: Colors.green[100],
             elevation: 5,
             child: InkWell(
@@ -76,13 +82,12 @@ class UserListState extends State<UsersScreen> {
                 child: Center(
                   child: Text(
                     '${_users[index].name}',
-                    // Some weird bugs if passed without quotes
-                    style: TextStyle(fontSize: 18.0),
+                    style: TextStyle(fontSize: 20.0),
                   ),
                 ))),
       ));
 
-  void fetchUsers() async {
+  void getUsers() async {
     var snapshot =
         await FirebaseDatabase.instance.reference().child('users').once();
 
@@ -95,7 +100,6 @@ class UserListState extends State<UsersScreen> {
     });
   }
 
-  // Haven't figured out how to use built-in map-to-POJO parsers yet
   GameUser parseUser(String userId, Map<dynamic, dynamic> user) {
     String name, photoUrl, pushId;
     user.forEach((key, value) {

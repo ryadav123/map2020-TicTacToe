@@ -4,7 +4,6 @@ import 'package:TicTacToe/screens/users_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:TicTacToe/screens/game_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-//import 'package:TicTacToe/model/gameuser.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -32,15 +31,12 @@ class _HomeState extends State<HomeScreen> {
     super.initState();
     firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
-        print("onMessage: $message\n\n");
         handleMessage(message);
       },
       onLaunch: (Map<String, dynamic> message) async {
-        print("onLaunch: $message\n\n");
         handleMessage(message);
       },
       onResume: (Map<String, dynamic> message) async {
-        print("onResume: $message\n\n");
         handleMessage(message);
       },
     );
@@ -81,18 +77,13 @@ class _HomeState extends State<HomeScreen> {
           children: [
             Image.asset('assets/images/tictactoe.jpg',width: 210,height: 150),
             MaterialButton(
-                onPressed: () {
-                  Navigator.of(context).pushNamed(GameScreen.routeName);
-                },
+                onPressed: () {Navigator.of(context).pushNamed(GameScreen.routeName);},
                 padding: EdgeInsets.all(8.0),
-                child: Text('Single Player', style: TextStyle(fontSize: 30.0))),
+                child: Text('Single Player', style: TextStyle(fontSize: 30.0,color: Colors.blue))),
             MaterialButton(
                 padding: EdgeInsets.all(8.0),
-                onPressed: () {
-                  openUserList();
-                },
-                child:
-                    Text('Multi Player', style: TextStyle(fontSize: 35.0))),
+                onPressed: () {inviteUsers();},
+                child: Text('Multi Player', style: TextStyle(fontSize: 35.0,color: Colors.blue))),
           ],
         ),
       ));
@@ -128,9 +119,15 @@ class _HomeState extends State<HomeScreen> {
     );
   }
 
-  void openUserList() async {
+  // Inviting the users
+  void inviteUsers() async {
+    MyDialog.circularProgressStart(context);
+    // Sign in with the google account first
     User user = await signInWithGoogle();
-    await saveUserToFirebase(user);
+    // Save the user to the realtime database
+    await saveUser(user);
+    MyDialog.circularProgressEnd(context);
+    // Start the multiplayer game then
     Navigator.of(context).pushNamed(UsersScreen.routeName);
   }
 
@@ -156,10 +153,8 @@ class _HomeState extends State<HomeScreen> {
     return user;
   }
 
-  Future<void> saveUserToFirebase(User user) async {
-    print('saving user to firebase');
+  Future<void> saveUser(User user) async {
     var token = await firebaseMessaging.getToken();
-
     await saveUserToPreferences(user.uid, user.displayName, token);
 
     var update = {
@@ -186,8 +181,6 @@ class _HomeState extends State<HomeScreen> {
     var currentUser = await _auth.currentUser;
     if (currentUser != null) {
       var token = await firebaseMessaging.getToken();
-      print("token is $token");
-
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('pushId', token);
 
@@ -196,7 +189,6 @@ class _HomeState extends State<HomeScreen> {
           .child('users')
           .child(currentUser.uid)
           .update({'pushId': token});
-      print('updated FCM token');
     }
   }
 
@@ -221,8 +213,8 @@ class _HomeState extends State<HomeScreen> {
 
     Navigator.of(context).push(new MaterialPageRoute(
         builder: (context) => new GameScreen(
-            title: 'Tic Tac Toe',
-            type: "wifi",
+            title: 'Multiplayer',
+            type: "Online",
             me: 'O',
             gameId: gameId,
             withId: fromId)));
@@ -239,12 +231,11 @@ class _HomeState extends State<HomeScreen> {
       showInvitePopup(context, message);
     } else if (type == 'accept') {
       var currentUser = await _auth.currentUser;
-
       String gameId = '${currentUser.uid}-$fromId';
       Navigator.of(context).push(new MaterialPageRoute(
           builder: (context) => new GameScreen(
-              title: 'Tic Tac Toe',
-              type: "wifi",
+              title: 'Multiplayer',
+              type: "Online",
               me: 'X',
               gameId: gameId,
               withId: fromId)));

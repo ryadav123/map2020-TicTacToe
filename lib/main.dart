@@ -17,10 +17,10 @@ class TicTacToe extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: HomeScreen(title: 'Home Screen'),
+        home: HomeScreen(title: 'Home'),
         routes: <String, WidgetBuilder>{
           GameScreen.routeName: (BuildContext context) => GameScreen(title: 'Player vs AI'),
-          UsersScreen.routeName: (BuildContext context) => UsersScreen(title: 'All Users')
+          UsersScreen.routeName: (BuildContext context) => UsersScreen(title: 'Invite Users')
         },
       );
 }

@@ -86,11 +86,11 @@ class GameState extends State<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print('game build');
-    print(type);
-    print(me);
-    print(gameId);
-    print(withId);
+    // print('game build');
+    // print(type);
+    // print(me);
+    // print(gameId);
+    // print(withId);
 
     ai = AI(field, playerChar, aiChar);
     return Scaffold(
@@ -108,6 +108,27 @@ class GameState extends State<GameScreen> {
               ),
             ),
           ),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.forward_5),
+               onPressed: () {                  
+                  if (type == null) {
+                    setState(() {
+                      winner = false; 
+                      draft = false;                    
+                      field = [
+                        ['', '', ''],
+                        ['', '', ''],
+                        ['', '', '']
+                      ];
+                      playersTurn = true;
+                    });
+                  } else {
+                    restart();
+                  }
+                },
+               ),            
+          ],
           elevation: 0,
           flexibleSpace: ClipPath(
             clipper: _AppBarClipper(),
@@ -192,11 +213,10 @@ class GameState extends State<GameScreen> {
             // Displaying player turn
             if (!gameIsDone() && playersTurn && !cellTaken(row, column)) {
               setState(() {
-                  print('clicked on row $row column $column');
                   playersTurn = false;
                   field[row][column] = playerChar;
                   // In case of multiplayer
-                      if (type != null && type == 'wifi') {
+                      if (type != null && type == 'Online') {
                         FirebaseDatabase.instance
                             .reference()
                             .child('games')
@@ -394,14 +414,13 @@ class GameState extends State<GameScreen> {
           winnermessage = "Draft";
     }
 
-    if (winner || draft) {     
-      print(winnermessage);
+    if (winner || draft) {      
       showDialog(
       barrierDismissible: false,
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Center(child: Text('Game Alert')),
+          title: Center(child: Text('Game Alert $winner')),
           content: Text(winnermessage),
           actions: <Widget> [
             FlatButton(
@@ -434,6 +453,7 @@ class GameState extends State<GameScreen> {
     }
   }
 
+  // Restarting when playing online
   void restart() async {
     await FirebaseDatabase.instance
         .reference()
