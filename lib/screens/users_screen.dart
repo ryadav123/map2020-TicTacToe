@@ -58,7 +58,7 @@ class UserListState extends State<UsersScreen> {
           ),
            actions: <Widget>[
             IconButton(
-              icon: Icon(Icons.home),
+              icon: Icon(Icons.exit_to_app),
                onPressed: () { 
                  signOutWithGoogle();       
                 },

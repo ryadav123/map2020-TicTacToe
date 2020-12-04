@@ -226,7 +226,7 @@ class GameState extends State<GameScreen> {
 
                   print('Inside ai if');   
                   print("Winner = $winner");       
-                  Timer(Duration(milliseconds: 1000), () {
+                  Timer(Duration(milliseconds: 400), () {
                     setState(() {
                     // AI turn
                     var aiDecision = ai.getDecision();
@@ -411,7 +411,7 @@ class GameState extends State<GameScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Center(child: Text('Game Alert $winner')),
+          title: Center(child: Text('Game Alert')),
           content: Text(winnermessage),
           actions: <Widget> [
             FlatButton(
