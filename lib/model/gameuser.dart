@@ -1,5 +1,5 @@
 class GameUser {
-  String id, name, photoUrl, pushId;
+  String id, name, photoUrl, pushId,email;
 
-  GameUser(this.id, this.name, this.photoUrl, this.pushId);
+  GameUser(this.id, this.name, this.photoUrl, this.pushId,this.email);
 }

@@ -14,6 +14,7 @@ import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key key, this.title}) : super(key: key);
+  static const routeName = '/homeScreen';
 
   final String title;
   
@@ -42,7 +43,7 @@ class _HomeState extends State<HomeScreen> {
     );
     firebaseMessaging.requestNotificationPermissions(
         IosNotificationSettings(sound: true, badge: true, alert: true));
-    updateFcmToken();
+    updateToken();
   }
 
   @override
@@ -77,12 +78,21 @@ class _HomeState extends State<HomeScreen> {
             SizedBox(height: 50,),
             Image.asset('assets/images/tictactoe.jpg',width: 210,height: 150),
             SizedBox(height: 25,),
-            MaterialButton(
-                onPressed: () {Navigator.of(context).pushNamed(GameScreen.routeName);},
-                child: Text('Single Player', style: TextStyle(fontSize: 30.0,color: Colors.blue))),
-            MaterialButton(
-                onPressed: () {inviteUsers();},
-                child: Text('Multi Player', style: TextStyle(fontSize: 35.0,color: Colors.blue))),
+            Text("Choose Game Mode", style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold, color: Colors.red),),
+            Card(
+              elevation: 5.0,
+              color: Colors.greenAccent,
+                          child: MaterialButton(
+                  onPressed: () {Navigator.of(context).pushNamed(GameScreen.routeName);},
+                  child: Text('Single Player', style: TextStyle(fontSize: 20.0,color: Colors.blue))),
+            ),
+            Card(
+              elevation: 5.0,
+              color: Colors.greenAccent,
+                          child: MaterialButton(
+                  onPressed: () {inviteUsers();},
+                  child: Text('Multi Player', style: TextStyle(fontSize: 25.0,color: Colors.blue))),
+            ),
           ],
         ),
       ));
@@ -127,7 +137,7 @@ class _HomeState extends State<HomeScreen> {
     await saveUser(user);
     MyDialog.circularProgressEnd(context);
     // Start the multiplayer game then
-    Navigator.of(context).pushNamed(UsersScreen.routeName);
+    Navigator.of(context).pushNamed(UsersScreen.routeName,arguments: {'user':user});
   }
 
    
@@ -146,18 +156,19 @@ class _HomeState extends State<HomeScreen> {
       AuthCredential credential = GoogleAuthProvider.credential(idToken:googleAuth.idToken,accessToken:googleAuth.accessToken);
       UserCredential result = await _auth.signInWithCredential(credential);
       user = await _auth.currentUser;
-      print("signed in as " + user.displayName);
+      print("signed in as " + user.email);
       }
-    print("signed in as " + user.displayName);
+    print("signed in as " + user.email);
     return user;
   }
 
   Future<void> saveUser(User user) async {
     var token = await firebaseMessaging.getToken();
-    await saveUserToPreferences(user.uid, user.displayName, token);
+    await saveUserToPreferences(user.uid, user.displayName, user.email, token);
 
     var update = {
       'name': user.displayName,
+      'email':user.email,
       'photoUrl': user.photoUrl,
       'pushId': token
     };
@@ -168,15 +179,15 @@ class _HomeState extends State<HomeScreen> {
         .update(update);
   }
 
-  saveUserToPreferences(String userId, String userName, String pushId) async {
+  saveUserToPreferences(String userId, String userName,String email, String pushId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('userId', userId);
+    prefs.setString('email', email);
     prefs.setString('pushId', pushId);
     prefs.setString('userName', userName);
   }
 
-  // just to make sure correct one is always set
-  void updateFcmToken() async {
+  void updateToken() async {
     var currentUser = await _auth.currentUser;
     if (currentUser != null) {
       var token = await firebaseMessaging.getToken();

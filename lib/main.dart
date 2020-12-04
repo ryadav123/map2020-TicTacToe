@@ -19,6 +19,7 @@ class TicTacToe extends StatelessWidget {
         ),
         home: HomeScreen(title: 'Home'),
         routes: <String, WidgetBuilder>{
+          HomeScreen.routeName: (BuildContext context) => HomeScreen(title: 'Home',),
           GameScreen.routeName: (BuildContext context) => GameScreen(title: 'Player vs AI'),
           UsersScreen.routeName: (BuildContext context) => UsersScreen(title: 'Invite Users')
         },
