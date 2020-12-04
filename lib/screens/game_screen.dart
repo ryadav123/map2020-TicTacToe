@@ -31,10 +31,10 @@ class GameState extends State<GameScreen> {
   final String type, me, gameId, withId;
   bool winner = false;
   bool draft = false;
-  int win_row = -1;
-  int win_col = -1;
-  String win_line = "";
-
+  int winrow = -1;
+  int wincol = -1;
+  String winline = "";
+  
   GameState({this.type, this.me, this.gameId, this.withId});
 
   @override
@@ -74,11 +74,8 @@ class GameState extends State<GameScreen> {
           });
         }
       });
-
-      // Haven't figured out how to display a Snackbar during build yet
       new Timer(Duration(milliseconds: 1000), () {
         String text = playersTurn ? 'Your turn' : 'Opponent\'s turn';
-        print(text);
         Scaffold.of(_context).showSnackBar(SnackBar(content: Text(text)));
       });
     }
@@ -86,12 +83,6 @@ class GameState extends State<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // print('game build');
-    // print(type);
-    // print(me);
-    // print(gameId);
-    // print(withId);
-
     ai = AI(field, playerChar, aiChar);
     return Scaffold(
         appBar:PreferredSize(
@@ -191,7 +182,7 @@ class GameState extends State<GameScreen> {
                                   ])),
                     // Building thw winner line if any
                     AspectRatio(
-                           aspectRatio: 1.0, child: CustomPaint(painter: WinnerLine(winner,win_line,win_row,win_col)))
+                           aspectRatio: 1.0, child: CustomPaint(painter: WinnerLine(winner,winline,winrow,wincol)))
                     ]));
         }));
   }
@@ -225,16 +216,16 @@ class GameState extends State<GameScreen> {
                             .set(me);
                       }
 
-                  Timer(Duration(milliseconds: 600), () {                   
+                  Timer(Duration(milliseconds: 100), () {                   
                       winnerCheck();                  
                   });                
               });
 
               // Displaying AI turn       
-              print('Before winner Value:$winner');    
-              if (!gameIsDone() && type == null && winner == false) {
-                  print('Inside if of AI Value of winner is:$winner');
-                  print('Inside set state of AI');                
+             if (!gameIsDone() && type == null) {    
+
+                  print('Inside ai if');   
+                  print("Winner = $winner");       
                   Timer(Duration(milliseconds: 1000), () {
                     setState(() {
                     // AI turn
@@ -296,8 +287,8 @@ class GameState extends State<GameScreen> {
         field[0][0] == field[0][2])
         {
           winner = true;
-          win_line = "Hor";
-          win_row = 0;
+          winline = "Hor";
+          winrow = 0;
           if (field[0][0] == playerChar) {
           winnermessage = "You Win";
           } else if (type==null) {
@@ -309,8 +300,8 @@ class GameState extends State<GameScreen> {
         field[1][0] == field[1][1] &&
         field[1][0] == field[1][2]) {
           winner = true;
-          win_line = "Hor";
-          win_row = 1;
+          winline = "Hor";
+          winrow = 1;
           if (field[1][0] == playerChar) {
           winnermessage = "You Win";
           } else if (type==null) {
@@ -322,8 +313,8 @@ class GameState extends State<GameScreen> {
         field[2][0] == field[2][1] &&
         field[2][0] == field[2][2]) {
           winner = true;
-          win_line = "Hor";
-          win_row = 2;
+          winline = "Hor";
+          winrow = 2;
           if (field[2][0] == playerChar) {
           winnermessage = "You Win";
           } else if (type==null) {
@@ -338,8 +329,8 @@ class GameState extends State<GameScreen> {
         field[0][0] == field[1][0] &&
         field[0][0] == field[2][0]) {
           winner = true;
-          win_line = "Ver";
-          win_col = 0;
+          winline = "Ver";
+          wincol = 0;
           if (field[0][0] == playerChar) {
           winnermessage = "You Win";
           } else if (type==null) {
@@ -351,8 +342,8 @@ class GameState extends State<GameScreen> {
         field[0][1] == field[1][1] &&
         field[0][1] == field[2][1]) {
           winner = true;
-          win_line = "Ver";
-          win_col = 1;
+          winline = "Ver";
+          wincol = 1;
           if (field[0][1] == playerChar) {
           winnermessage = "You Win";
           } else if (type==null) {
@@ -364,8 +355,8 @@ class GameState extends State<GameScreen> {
         field[0][2] == field[1][2] &&
         field[0][2] == field[2][2]) {
           winner = true;
-          win_line = "Ver";
-          win_col = 2;
+          winline = "Ver";
+          wincol = 2;
           if (field[0][2] == playerChar) {
           winnermessage = "You Win";
           } else if (type==null) {
@@ -380,7 +371,7 @@ class GameState extends State<GameScreen> {
         field[0][0] == field[1][1] &&
         field[0][0] == field[2][2]) {
           winner = true;
-          win_line = "Dia_Des";          
+          winline = "Dia_Des";          
           if (field[0][0] == playerChar) {
           winnermessage = "You Win";
           } else if (type==null) {
@@ -392,7 +383,7 @@ class GameState extends State<GameScreen> {
         field[2][0] == field[1][1] &&
         field[2][0] == field[0][2]) {
           winner = true;
-          win_line = "Dia_Asc";
+          winline = "Dia_Asc";
           if (field[2][0] == playerChar) {
           winnermessage = "You Win";
           } else if (type==null) {
@@ -414,7 +405,7 @@ class GameState extends State<GameScreen> {
           winnermessage = "Draft";
     }
 
-    if (winner || draft) {      
+    if (winner || draft) {         
       showDialog(
       barrierDismissible: false,
       context: context,

@@ -127,11 +127,7 @@ class UserListState extends State<UsersScreen> {
     var base = 'https://us-central1-rohan-map2020-tictactoe-c2242.cloudfunctions.net';
     String dataURL = '$base/Invitation?to=${user
         .pushId}&fromPushId=$pushId&fromId=$userId&fromName=$username&type=invite';
-    print('pushId = $pushId \n\n');
-    print('userId = $userId \n\n');
-    print('username = $username \n\n');
     String gameId = '$userId-${user.id}';
-    print('gameId = $gameId \n\n');
     FirebaseDatabase.instance
         .reference()
         .child('games')

@@ -73,15 +73,14 @@ class _HomeState extends State<HomeScreen> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            SizedBox(height: 50,),
             Image.asset('assets/images/tictactoe.jpg',width: 210,height: 150),
+            SizedBox(height: 25,),
             MaterialButton(
                 onPressed: () {Navigator.of(context).pushNamed(GameScreen.routeName);},
-                padding: EdgeInsets.all(8.0),
                 child: Text('Single Player', style: TextStyle(fontSize: 30.0,color: Colors.blue))),
             MaterialButton(
-                padding: EdgeInsets.all(8.0),
                 onPressed: () {inviteUsers();},
                 child: Text('Multi Player', style: TextStyle(fontSize: 35.0,color: Colors.blue))),
           ],
