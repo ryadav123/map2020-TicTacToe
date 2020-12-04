@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:TicTacToe/model/winnerline.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:TicTacToe/ai/ai.dart';
+import 'package:TicTacToe/model/ai.dart';
 
 class GameScreen extends StatefulWidget {
 

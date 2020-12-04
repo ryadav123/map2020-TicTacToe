@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:TicTacToe/ai/decision.dart';
+import 'package:TicTacToe/model/decision.dart';
 
 class AI {
   List<List<String>> _field;
