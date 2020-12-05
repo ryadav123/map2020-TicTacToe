@@ -66,7 +66,7 @@ class GameState extends State<GameScreen> {
 
           setState(() {
             Scaffold.of(_context).hideCurrentSnackBar();
-            cleanUp();
+            resetGame();
           });
         }
       });
@@ -137,12 +137,12 @@ class GameState extends State<GameScreen> {
                                 child: Stack(
                                   children: [
                                     Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                                      buildHorizontalLine,
-                                      buildHorizontalLine,
+                                      buildHorLine,
+                                      buildHorLine,
                                     ]),
                                     Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                                      buildVerticalLine,
-                                      buildVerticalLine,
+                                      buildVerLine,
+                                      buildVerLine,
                                     ])
                                   ],
                                 )),
@@ -180,12 +180,12 @@ class GameState extends State<GameScreen> {
         }));
   }
 
-  Container get buildVerticalLine => Container(
+  Container get buildVerLine => Container(
       margin: EdgeInsets.only(top: 16.0, bottom: 16.0),
       color: Colors.black,
       width: 10.0);
 
-  Container get buildHorizontalLine => Container(
+  Container get buildHorLine => Container(
       margin: EdgeInsets.only(left: 16.0, right: 16.0),
       color: Colors.black,
       height: 10.0);
@@ -214,7 +214,7 @@ class GameState extends State<GameScreen> {
               });
 
               // Displaying AI turn       
-             if (!gameIsDone() && type == null) {    
+             if (!gameIsDone() && type == null) {   
                   Timer(Duration(milliseconds: 400), () {
                     setState(() {
                     // AI turn
@@ -249,14 +249,14 @@ class GameState extends State<GameScreen> {
   }
 
   bool gameIsDone() {
-    return allCellsAreTaken() || winner;
+    return allCellsTaken() || winner;
   }
 
   bool cellTaken (row,column) {
     return field[row][column].isNotEmpty;
   }
 
-  bool allCellsAreTaken() {
+  bool allCellsTaken() {
     return field[0][0].isNotEmpty &&
         field[0][1].isNotEmpty &&
         field[0][2].isNotEmpty &&
@@ -386,9 +386,9 @@ class GameState extends State<GameScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Center(child: Text('Game Alert')),
+          title: Center(child: Text('Game Alert',style: TextStyle(fontWeight: FontWeight.bold,color: Colors.red),)),
           content: Text(winnermessage),
-          actions: <Widget> [                
+          actions: <Widget> [   
             FlatButton(
               child: Text('OK'),
               onPressed: () => Navigator.of(context).pop(),
@@ -416,11 +416,11 @@ class GameState extends State<GameScreen> {
         .set(true);
 
     setState(() {
-      cleanUp();
+      resetGame();
     });
   }
 
-  void cleanUp() {
+  void resetGame() {
     winner = false;   
     field = [
       ['', '', ''],
@@ -429,6 +429,7 @@ class GameState extends State<GameScreen> {
     ];
     playersTurn = me == 'X';
     String text = playersTurn ? 'Your turn' : 'Opponent\'s turn';
+    print(text);
     Scaffold.of(_context).showSnackBar(SnackBar(content: Text(text)));
   }
 }

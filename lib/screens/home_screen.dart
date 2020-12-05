@@ -8,7 +8,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:TicTacToe/model/utility.dart';
 import 'package:http/http.dart' as http;
 
 
@@ -136,7 +135,7 @@ class _HomeState extends State<HomeScreen> {
   }
    
   Future<User> signInWithGoogle() async {
-    User user = await _auth.currentUser;
+    User user = _auth.currentUser;
     if (user == null) {
       GoogleSignInAccount googleUser = _googleSignIn.currentUser;
       if (googleUser == null) {
@@ -149,7 +148,7 @@ class _HomeState extends State<HomeScreen> {
       GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       AuthCredential credential = GoogleAuthProvider.credential(idToken:googleAuth.idToken,accessToken:googleAuth.accessToken);
       UserCredential result = await _auth.signInWithCredential(credential);
-      user = await _auth.currentUser;
+      user = _auth.currentUser;
       }
     return user;
   }
@@ -235,6 +234,17 @@ class _HomeState extends State<HomeScreen> {
               gameId: gameId,
               withId: fromId)));
     } else if (type == 'reject') {}
+  }
+
+  String getValue(Map<String, dynamic> message, String key) {
+  var result;  
+    final notification = message['notification'];
+    final data = message['data'];
+    if(key=='type' ) {result = data['type'];}
+    if (key == 'fromId' ) {result = data['fromId'];}
+    if (key == 'fromPushId' ) {result = data['fromPushId'];}
+    if (key == 'fromName' ) {result = data['fromName'];}
+    return result;
   }
 }
 
