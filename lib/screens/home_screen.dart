@@ -137,7 +137,7 @@ class _HomeState extends State<HomeScreen> {
     await saveUser(user);
     MyDialog.circularProgressEnd(context);
     // Start the multiplayer game then
-    Navigator.of(context).pushNamed(UsersScreen.routeName,arguments: {'user':user});
+    Navigator.of(context).pushNamed(UsersScreen.routeName,arguments: {'user':user});    
   }
 
    

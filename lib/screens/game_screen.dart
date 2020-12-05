@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:TicTacToe/model/winnerline.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:TicTacToe/model/ai.dart';
@@ -30,10 +29,7 @@ class GameState extends State<GameScreen> {
  
   final String type, me, gameId, withId;
   bool winner = false;
-  bool draft = false;
-  int winrow = -1;
-  int wincol = -1;
-  String winline = "";
+  bool draft = false; 
   
   GameState({this.type, this.me, this.gameId, this.withId});
 
@@ -181,8 +177,8 @@ class GameState extends State<GameScreen> {
                                         ]))
                                   ])),
                     // Building thw winner line if any
-                    AspectRatio(
-                           aspectRatio: 1.0, child: CustomPaint(painter: WinnerLine(winner,winline,winrow,wincol)))
+                    // AspectRatio(
+                    //        aspectRatio: 1.0, child: CustomPaint(painter: WinnerLine(winner,winline,winrow,wincol)))
                     ]));
         }));
   }
@@ -287,8 +283,6 @@ class GameState extends State<GameScreen> {
         field[0][0] == field[0][2])
         {
           winner = true;
-          winline = "Hor";
-          winrow = 0;
           if (field[0][0] == playerChar) {
           winnermessage = "You Win";
           } else if (type==null) {
@@ -300,8 +294,6 @@ class GameState extends State<GameScreen> {
         field[1][0] == field[1][1] &&
         field[1][0] == field[1][2]) {
           winner = true;
-          winline = "Hor";
-          winrow = 1;
           if (field[1][0] == playerChar) {
           winnermessage = "You Win";
           } else if (type==null) {
@@ -313,8 +305,6 @@ class GameState extends State<GameScreen> {
         field[2][0] == field[2][1] &&
         field[2][0] == field[2][2]) {
           winner = true;
-          winline = "Hor";
-          winrow = 2;
           if (field[2][0] == playerChar) {
           winnermessage = "You Win";
           } else if (type==null) {
@@ -329,8 +319,6 @@ class GameState extends State<GameScreen> {
         field[0][0] == field[1][0] &&
         field[0][0] == field[2][0]) {
           winner = true;
-          winline = "Ver";
-          wincol = 0;
           if (field[0][0] == playerChar) {
           winnermessage = "You Win";
           } else if (type==null) {
@@ -342,8 +330,6 @@ class GameState extends State<GameScreen> {
         field[0][1] == field[1][1] &&
         field[0][1] == field[2][1]) {
           winner = true;
-          winline = "Ver";
-          wincol = 1;
           if (field[0][1] == playerChar) {
           winnermessage = "You Win";
           } else if (type==null) {
@@ -355,8 +341,6 @@ class GameState extends State<GameScreen> {
         field[0][2] == field[1][2] &&
         field[0][2] == field[2][2]) {
           winner = true;
-          winline = "Ver";
-          wincol = 2;
           if (field[0][2] == playerChar) {
           winnermessage = "You Win";
           } else if (type==null) {
@@ -370,8 +354,7 @@ class GameState extends State<GameScreen> {
     else if (field[0][0].isNotEmpty &&
         field[0][0] == field[1][1] &&
         field[0][0] == field[2][2]) {
-          winner = true;
-          winline = "Dia_Des";          
+          winner = true;               
           if (field[0][0] == playerChar) {
           winnermessage = "You Win";
           } else if (type==null) {
@@ -383,7 +366,6 @@ class GameState extends State<GameScreen> {
         field[2][0] == field[1][1] &&
         field[2][0] == field[0][2]) {
           winner = true;
-          winline = "Dia_Asc";
           if (field[2][0] == playerChar) {
           winnermessage = "You Win";
           } else if (type==null) {
@@ -414,25 +396,25 @@ class GameState extends State<GameScreen> {
           title: Center(child: Text('Game Alert')),
           content: Text(winnermessage),
           actions: <Widget> [
-            FlatButton(
-              child: Text('Retry'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  if (type == null) {
-                    setState(() {
-                      winner = false; 
-                      draft = false;                    
-                      field = [
-                        ['', '', ''],
-                        ['', '', ''],
-                        ['', '', '']
-                      ];
-                      playersTurn = true;
-                    });
-                  } else {
-                    restart();
-                  }
-                }),            
+            // FlatButton(
+            //   child: Text('Retry'),
+            //     onPressed: () {
+            //       Navigator.of(context).pop();
+            //       if (type == null) {
+            //         setState(() {
+            //           winner = false; 
+            //           draft = false;                    
+            //           field = [
+            //             ['', '', ''],
+            //             ['', '', ''],
+            //             ['', '', '']
+            //           ];
+            //           playersTurn = true;
+            //         });
+            //       } else {
+            //         restart();
+            //       }
+            //     }),            
             FlatButton(
               child: Text('OK'),
               onPressed: () => Navigator.of(context).pop(),
