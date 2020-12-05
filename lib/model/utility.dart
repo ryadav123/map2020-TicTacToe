@@ -1,4 +1,4 @@
-String getValueFromMap(Map<String, dynamic> message, String key) {
+String getValue(Map<String, dynamic> message, String key) {
   print('Inside util function....\n');
   print('Value of map....\n');
   print(message);

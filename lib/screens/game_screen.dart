@@ -176,10 +176,7 @@ class GameState extends State<GameScreen> {
                                           buildCell(2, 2),
                                         ]))
                                   ])),
-                    // Building thw winner line if any
-                    // AspectRatio(
-                    //        aspectRatio: 1.0, child: CustomPaint(painter: WinnerLine(winner,winline,winrow,wincol)))
-                    ]));
+                   ]));
         }));
   }
 
@@ -202,7 +199,7 @@ class GameState extends State<GameScreen> {
               setState(() {
                   playersTurn = false;
                   field[row][column] = playerChar;
-                  // In case of multiplayer
+                       // In case of multiplayer
                       if (type != null && type == 'Online') {
                         FirebaseDatabase.instance
                             .reference()
@@ -211,7 +208,6 @@ class GameState extends State<GameScreen> {
                             .child('${row}_${column}')
                             .set(me);
                       }
-
                   Timer(Duration(milliseconds: 100), () {                   
                       winnerCheck();                  
                   });                
@@ -219,9 +215,6 @@ class GameState extends State<GameScreen> {
 
               // Displaying AI turn       
              if (!gameIsDone() && type == null) {    
-
-                  print('Inside ai if');   
-                  print("Winner = $winner");       
                   Timer(Duration(milliseconds: 400), () {
                     setState(() {
                     // AI turn
@@ -395,26 +388,7 @@ class GameState extends State<GameScreen> {
         return AlertDialog(
           title: Center(child: Text('Game Alert')),
           content: Text(winnermessage),
-          actions: <Widget> [
-            // FlatButton(
-            //   child: Text('Retry'),
-            //     onPressed: () {
-            //       Navigator.of(context).pop();
-            //       if (type == null) {
-            //         setState(() {
-            //           winner = false; 
-            //           draft = false;                    
-            //           field = [
-            //             ['', '', ''],
-            //             ['', '', ''],
-            //             ['', '', '']
-            //           ];
-            //           playersTurn = true;
-            //         });
-            //       } else {
-            //         restart();
-            //       }
-            //     }),            
+          actions: <Widget> [                
             FlatButton(
               child: Text('OK'),
               onPressed: () => Navigator.of(context).pop(),
@@ -455,7 +429,6 @@ class GameState extends State<GameScreen> {
     ];
     playersTurn = me == 'X';
     String text = playersTurn ? 'Your turn' : 'Opponent\'s turn';
-    print(text);
     Scaffold.of(_context).showSnackBar(SnackBar(content: Text(text)));
   }
 }

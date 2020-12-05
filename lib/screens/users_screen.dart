@@ -86,7 +86,6 @@ class UserListState extends State<UsersScreen> {
             : ListView.builder(
                 itemCount: _users.length,
                 itemBuilder: (BuildContext context, int index) => Container(
-                 // color: Colors.amber,
                   padding: EdgeInsets.all(4),                  
                   child: Card(      
                       shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(20)),                               
@@ -122,8 +121,7 @@ class UserListState extends State<UsersScreen> {
     
 }
   void getUsers() async {
-    var snapshot =
-        await FirebaseDatabase.instance.reference().child('users').once();
+    var snapshot = await FirebaseDatabase.instance.reference().child('users').once();
 
     Map<String, dynamic> users = snapshot.value.cast<String, dynamic>();
     users.forEach((userId, userMap) {
@@ -142,27 +140,23 @@ class UserListState extends State<UsersScreen> {
       if (key == 'pushId') {pushId = value as String;}
       if (key == 'email') {email = value as String;}
                               });
-
     return GameUser(userId, name, photoUrl, pushId,email);
   }
 
   invite(GameUser user) async {
-    print('Inviting user...\n');
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var username = prefs.getString('userName');
     var pushId = prefs.getString('pushId');
     var userId = prefs.getString('userId');
 
     var base = 'https://us-central1-rohan-map2020-tictactoe-c2242.cloudfunctions.net';
-    String dataURL = '$base/Invitation?to=${user
-        .pushId}&fromPushId=$pushId&fromId=$userId&fromName=$username&type=invite';
+    String dataURL = '$base/Invitation?to=${user.pushId}&fromPushId=$pushId&fromId=$userId&fromName=$username&type=invite';
     String gameId = '$userId-${user.id}';
     FirebaseDatabase.instance
         .reference()
         .child('games')
         .child(gameId)
         .set(null);
-    print('Invitation sent waiting for reply...\n');
     http.Response response = await http.get(dataURL);
   }
 }

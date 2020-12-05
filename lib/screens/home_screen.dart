@@ -107,22 +107,17 @@ class _HomeState extends State<HomeScreen> {
   }
 
   Widget buildDialog(BuildContext context, Map<String, dynamic> message) {
-    var fromName = getValueFromMap(message, 'fromName');
-
+    var fromName = getValue(message, 'fromName');
     return AlertDialog(
       content: Text('$fromName invites you to play!'),
       actions: <Widget>[
         FlatButton(
           child: Text('Decline'),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () {Navigator.pop(context);},
         ),
         FlatButton(
           child: Text('Accept'),
-          onPressed: () {
-            accept(message);
-          },
+          onPressed: () {accept(message);},
         ),
       ],
     );
@@ -139,7 +134,6 @@ class _HomeState extends State<HomeScreen> {
     // Start the multiplayer game then
     Navigator.of(context).pushNamed(UsersScreen.routeName,arguments: {'user':user});    
   }
-
    
   Future<User> signInWithGoogle() async {
     User user = await _auth.currentUser;
@@ -156,9 +150,7 @@ class _HomeState extends State<HomeScreen> {
       AuthCredential credential = GoogleAuthProvider.credential(idToken:googleAuth.idToken,accessToken:googleAuth.accessToken);
       UserCredential result = await _auth.signInWithCredential(credential);
       user = await _auth.currentUser;
-      print("signed in as " + user.email);
       }
-    print("signed in as " + user.email);
     return user;
   }
 
@@ -174,7 +166,7 @@ class _HomeState extends State<HomeScreen> {
     };
     return FirebaseDatabase.instance
         .reference()
-        .child('users') // heading under which users are  saved in realtime database
+        .child('users')       // heading under which users are  saved in realtime database
         .child(user.uid)
         .update(update);
   }
@@ -204,18 +196,15 @@ class _HomeState extends State<HomeScreen> {
 
   void accept(Map<String, dynamic> message) async {
     Navigator.pop(context);
-    print('Inside accept function..');
-    String fromPushId = getValueFromMap(message, 'fromPushId');
-    String fromId = getValueFromMap(message, 'fromId');
+    String fromPushId = getValue(message, 'fromPushId');
+    String fromId = getValue(message, 'fromId');
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var username = prefs.getString('userName');
     var pushId = prefs.getString('pushId');
     var userId = prefs.getString('userId');
 
     var base = 'https://us-central1-rohan-map2020-tictactoe-c2242.cloudfunctions.net';
-    String dataURL =
-        '$base/Invitation?to=$fromPushId&fromPushId=$pushId&fromId=$userId&fromName=$username&type=accept';
-    print(dataURL);
+    String dataURL = '$base/Invitation?to=$fromPushId&fromPushId=$pushId&fromId=$userId&fromName=$username&type=accept';
     MyDialog.circularProgressStart(context);
     http.Response response = await http.get(dataURL);
     MyDialog.circularProgressEnd(context);
@@ -223,7 +212,7 @@ class _HomeState extends State<HomeScreen> {
 
     Navigator.of(context).push(new MaterialPageRoute(
         builder: (context) => new GameScreen(
-            title: 'Multiplayer',
+            title: 'Multi Player',
             type: "Online",
             me: 'O',
             gameId: gameId,
@@ -231,12 +220,8 @@ class _HomeState extends State<HomeScreen> {
   }
 
   void handleMessage(Map<String, dynamic> message) async {
-    print('Decoding type..\n');
-    var type = getValueFromMap(message, 'type');
-    print('Decoding fromId..\n');
-    var fromId = getValueFromMap(message, 'fromId');
-    print('Message has been received. The type of message is: ');
-    print(type);
+    var type = getValue(message, 'type');
+    var fromId = getValue(message, 'fromId');
     if (type == 'invite') {
       showInvitePopup(context, message);
     } else if (type == 'accept') {
@@ -244,7 +229,7 @@ class _HomeState extends State<HomeScreen> {
       String gameId = '${currentUser.uid}-$fromId';
       Navigator.of(context).push(new MaterialPageRoute(
           builder: (context) => new GameScreen(
-              title: 'Multiplayer',
+              title: 'Multi Player',
               type: "Online",
               me: 'X',
               gameId: gameId,
