@@ -54,16 +54,20 @@ class GameState extends State<GameScreen> {
             setState(() {
               field[row][column] = event.snapshot.value;
               playersTurn = true;
-              Timer(Duration(milliseconds: 600), () {
-                setState(() {
-                  winnerCheck();
-                });
+              
+              setState(() {
+                winnerCheck();
               });
+              // Timer(Duration(milliseconds: 600), () {
+              //   setState(() {
+              //     winnerCheck();
+              //   });
+              // });
             });
           }
         } else if (key == 'restart') {
           FirebaseDatabase.instance.reference().child(gameId).set(null);
-
+         // if(!mounted) return;
           setState(() {
             Scaffold.of(_context).hideCurrentSnackBar();
             resetGame();
@@ -392,7 +396,7 @@ class GameState extends State<GameScreen> {
             FlatButton(
               child: Text('OK'),
               onPressed: () => Navigator.of(context).pop(),
-            ),
+            ),            
           ],
         );
       }
@@ -421,7 +425,8 @@ class GameState extends State<GameScreen> {
   }
 
   void resetGame() {
-    winner = false;   
+    winner = false;
+    draft = false;   
     field = [
       ['', '', ''],
       ['', '', ''],
@@ -429,7 +434,6 @@ class GameState extends State<GameScreen> {
     ];
     playersTurn = me == 'X';
     String text = playersTurn ? 'Your turn' : 'Opponent\'s turn';
-    print(text);
     Scaffold.of(_context).showSnackBar(SnackBar(content: Text(text)));
   }
 }
